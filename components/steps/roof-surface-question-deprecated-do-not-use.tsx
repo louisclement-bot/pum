@@ -1,5 +1,17 @@
 "use client"
 
+/**
+ * @deprecated DO NOT USE THIS FILE
+ * 
+ * This component is NOT used by the application.
+ * The actual component used is: roof-surface-question-fixed.tsx
+ * 
+ * This file exists only for reference and should be removed in a future cleanup.
+ * Any modifications should be made to roof-surface-question-fixed.tsx instead.
+ * 
+ * See BUG_FIX_GUIDE.md section 1.4 for the full debugging story.
+ */
+
 import { Button } from "@/components/ui/button"
 import type { SimulatorData } from "../rainwater-simulator"
 import { RulerIcon as RulerSquare, Check, HelpCircle } from "lucide-react"

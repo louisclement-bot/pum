@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useRef, useCallback, useMemo } fro
 import type { AddressSearchState, AddressSuggestion, AddressInputProps } from "../types/addressTypes"
 import { searchAddressByText, selectBuilding } from "../services/addressSearchService"
 import { fetchRoofDetails } from "../services/roofDetailsService"
+import { useSingleFlight } from "@/lib/useSingleFlight"
 
 // Create the context
 const AddressSearchContext = createContext<AddressSearchContextType | undefined>(undefined)
@@ -33,6 +34,7 @@ export type AddressSearchContextType = {
   handleContinue: () => void
   handleAddressSelect: (suggestion: AddressSuggestion) => void
   prevStep: () => void
+  isBusy: () => boolean
 }
 
 // Provider component
@@ -228,8 +230,8 @@ export function AddressSearchProvider({
     setTimeout(() => updateState({ showMap: true }), 100)
   }, [updateState])
 
-  // Handle continue button - ENHANCED WITH DEBUGGING
-  const handleContinue = useCallback(() => {
+  // Handle continue button - ENHANCED WITH DEBUGGING AND PROTECTED WITH SINGELFLIGHT
+  const _handleContinueImpl = useCallback(() => {
     console.log("Continue button clicked")
     console.log("Current state:", {
       selectedBuildingId: state.selectedBuildingId,
@@ -282,10 +284,13 @@ export function AddressSearchProvider({
 
     console.log("Data updated, navigating to next step")
     nextStep()
-  }, [state.selectedBuildingId, state.buildings, state.apiResponse, state.mapCenter, updateData, nextStep])
+  }, [state.selectedBuildingId, state.buildings, state.apiResponse, state.mapCenter, state.address, updateState, updateData, nextStep])
 
-  // Handle address selection from autocomplete
-  const handleAddressSelect = useCallback(
+  // Create a protected version with useSingleFlight
+  const [handleContinue, isBusy] = useSingleFlight(_handleContinueImpl)
+
+  // Handle address selection from autocomplete - PROTECTED WITH SINGELFLIGHT
+  const handleAddressSelectImpl = useCallback(
     (suggestion: AddressSuggestion) => {
       console.log("Address selected from autocomplete:", suggestion)
 
@@ -295,14 +300,14 @@ export function AddressSearchProvider({
         selectedSuggestion: suggestion,
       })
 
-      // Trigger search with the selected suggestion
-      // Small delay to ensure state is updated
-      setTimeout(() => {
-        handleSearch(suggestion)
-      }, 100)
+      // Trigger search with the selected suggestion directly (no setTimeout)
+      handleSearch(suggestion)
     },
     [updateState, handleSearch],
   )
+
+  // Protect with useSingleFlight
+  const [handleAddressSelect, isAddressSelectBusy] = useSingleFlight(handleAddressSelectImpl)
 
   // Context value - ENSURE STABILITY WITH USEMEMO
   const contextValue: AddressSearchContextType = useMemo(
@@ -315,6 +320,7 @@ export function AddressSearchProvider({
       handleContinue,
       handleAddressSelect,
       prevStep,
+      isBusy,
     }),
     [
       state,
@@ -325,6 +331,7 @@ export function AddressSearchProvider({
       handleContinue,
       handleAddressSelect,
       prevStep,
+      isBusy,
     ],
   )
 

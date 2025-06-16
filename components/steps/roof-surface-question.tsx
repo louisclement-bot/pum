@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import type { SimulatorData } from "../rainwater-simulator"
 import { RulerIcon as RulerSquare, Check, HelpCircle } from "lucide-react"
 import { STEP_IDS, SUBSTEP_IDS } from "@/constants/steps"
+import { useSingleFlight } from "@/lib/useSingleFlight"
 
 type RoofSurfaceQuestionProps = {
   data: SimulatorData
@@ -20,30 +21,19 @@ export default function RoofSurfaceQuestion({
   prevStep,
   goToStep,
 }: RoofSurfaceQuestionProps) {
-  const handleResponse = (knows: boolean) => {
-    console.log(`handleResponse called with knows=${knows}`)
-
-    // First update the data
+  // Core logic executed once thanks to the single-flight guard
+  const respondFn = (knows: boolean) => {
     updateData({ knowsRoofSurface: knows })
-    console.log(`Data updated: knowsRoofSurface=${knows}`)
 
-    // Log the constants being used
-    console.log(
-      `Constants: STEP_IDS.ROOF_SURFACE=${STEP_IDS.ROOF_SURFACE}, SUBSTEP_IDS.MANUAL_SURFACE_INPUT=${SUBSTEP_IDS.MANUAL_SURFACE_INPUT}, SUBSTEP_IDS.ADDRESS_INPUT=${SUBSTEP_IDS.ADDRESS_INPUT}`,
-    )
-
-    // Use setTimeout to ensure the state update completes before navigation
-    setTimeout(() => {
-      if (knows) {
-        console.log(`Navigating to: goToStep(${STEP_IDS.ROOF_SURFACE}, ${SUBSTEP_IDS.MANUAL_SURFACE_INPUT})`)
-        // Explicitly navigate to substep 2 (Saisie de la surface) of step 2
-        goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
-      } else {
-        console.log(`Navigating to: goToStep(${STEP_IDS.ROOF_SURFACE}, ${SUBSTEP_IDS.ADDRESS_INPUT})`)
-        goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
-      }
-    }, 0)
+    if (knows) {
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
+    } else {
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
+    }
   }
+
+  // Protect against double-clicks
+  const [respond, isBusy] = useSingleFlight(respondFn)
 
   return (
     <div className="space-y-8">
@@ -68,7 +58,8 @@ export default function RoofSurfaceQuestion({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <button
               type="button"
-              onClick={() => handleResponse(true)}
+              onClick={() => respond(true)}
+              disabled={isBusy()}
               className="bg-white dark:bg-slate-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800 hover:border-[#1D40AF] dark:hover:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer w-full text-left"
             >
               <div className="flex items-center gap-4">
@@ -83,7 +74,8 @@ export default function RoofSurfaceQuestion({
 
             <button
               type="button"
-              onClick={() => handleResponse(false)}
+              onClick={() => respond(false)}
+              disabled={isBusy()}
               className="bg-white dark:bg-slate-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800 hover:border-[#1D40AF] dark:hover:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer w-full text-left"
             >
               <div className="flex items-center gap-4">

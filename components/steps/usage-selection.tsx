@@ -13,6 +13,7 @@ import { Users } from "lucide-react"
 import { WateringPlantIcon } from "../icons/watering-plant-icon"
 import { ToiletIcon } from "../icons/toilet-icon"
 import { WashingMachineIcon } from "../icons/washing-machine-icon"
+import { useSingleFlight } from "@/lib/useSingleFlight"
 
 type UsageSelectionProps = {
   data: SimulatorData
@@ -63,6 +64,9 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
       nextStep()
     }
   }
+
+  // Wrap handleNext with single-flight guard to prevent double clicks
+  const [safeNext, isBusy] = useSingleFlight(handleNext)
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -124,7 +128,7 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
         </div>
       )}
 
-      <StepButtons onNext={handleNext} nextDisabled={selectedUsages.length === 0} />
+      <StepButtons onNext={safeNext} busy={isBusy()} nextDisabled={selectedUsages.length === 0} />
     </div>
   )
 }

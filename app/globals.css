@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 201 94% 41%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 201 94% 41%;
+    --radius: 0.75rem;
+
+    /* Custom colors */
+    --water-light: 201 94% 85%;
+    --water-medium: 201 94% 75%;
+    --water-dark: 201 94% 41%;
+    --eco-light: 142 69% 85%;
+    --eco-medium: 142 69% 58%;
+    --eco-dark: 142 69% 38%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 9.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 201 94% 41%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 201 94% 41%;
+
+    /* Custom colors - dark mode */
+    --water-light: 201 94% 25%;
+    --water-medium: 201 94% 35%;
+    --water-dark: 201 94% 50%;
+    --eco-light: 142 69% 20%;
+    --eco-medium: 142 69% 30%;
+    --eco-dark: 142 69% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .water-gradient {
+    @apply bg-gradient-to-br from-[#3498db] to-[#2980b9] dark:from-[#1a5276] dark:to-[#154360];
+  }
+
+  .eco-gradient {
+    @apply bg-gradient-to-br from-[#2ecc71] to-[#27ae60] dark:from-[#1e8449] dark:to-[#196f3d];
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-black/50 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-lg;
+  }
+
+  .animated-gradient {
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .floating {
+    animation: floating 3s ease-in-out infinite;
+  }
+
+  @keyframes floating {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  /* Enhanced mobile responsiveness */
+  @media (max-width: 640px) {
+    .leaflet-container {
+      min-height: 250px !important;
+      max-height: 350px !important;
+    }
+
+    .building-detail-card {
+      padding: 0.75rem !important;
+    }
+
+    .privacy-notice {
+      font-size: 0.75rem !important;
+      line-height: 1.2 !important;
+      margin-top: 0.5rem !important;
+    }
+
+    .leaflet-touch .leaflet-control-zoom a {
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+    }
+  }
+
+  /* Medium screens */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .leaflet-container {
+      min-height: 350px !important;
+    }
+  }
+
+  /* Touch-friendly controls */
+  .leaflet-touch .leaflet-bar a {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  /* Print styles */
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    .print\:hidden {
+      display: none !important;
+    }
+
+    .print\:block {
+      display: block !important;
+    }
+
+    .print\:text-black {
+      color: black !important;
+    }
+
+    .print\:text-gray-700 {
+      color: #374151 !important;
+    }
+
+    .print\:text-gray-800 {
+      color: #1f2937 !important;
+    }
+
+    .print\:border {
+      border-width: 1px !important;
+    }
+
+    .print\:border-gray-300 {
+      border-color: #d1d5db !important;
+    }
+
+    .print\:shadow-none {
+      box-shadow: none !important;
+    }
+
+    .print\:bg-white {
+      background-color: white !important;
+    }
+
+    .print\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* Animation for error feedback */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+}

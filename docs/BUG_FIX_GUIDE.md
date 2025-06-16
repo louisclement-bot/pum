@@ -6,6 +6,14 @@ Les tâches sont priorisées ; chaque action cite : fichier, lignes approximativ
 
 ---
 
+> **Statut d’implémentation — juillet 2025**
+>
+> | Priorité | Domaine | Statut |
+> |----------|---------|--------|
+> | **P0**   | Défense anti-double-clic | ✅ Implémenté (commit `eff3200`, branche `droid/p0-anti-double-click-fixes`) |
+> | **P1**   | Navigation & Adresse     | 🔄 En cours |
+> | **P2**   | Calculs, UX, Aides       | ⏳ À faire |
+
 ## 1. Défense globale anti-double-clic (P0)
 
 ### 1.1  Hook générique `useSingleFlight`

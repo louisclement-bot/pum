@@ -79,7 +79,7 @@ Durant la mise en place de la défense anti-double-clic, un problème subtil a �
 | **Cause racine** | `rainwater-simulator.tsx` importe la version *-fixed* :<br>`import RoofSurfaceQuestion from "./steps/roof-surface-question-fixed"` |
 | **Comment le détecter ?** | 1. Les logs indiquaient encore deux navigations.<br>2. Rechercher dans le projet `roof-surface-question-fixed` a révélé la duplication. |
 | **Correctif appliqué** | • Copié/porté le hook `useSingleFlight` sur `roof-surface-question-fixed.tsx`.<br>• Ajout de `disabled={isBusy()}` sur les boutons **Oui / Non**.<br>• Utilisation des constantes `STEP_IDS`/`SUBSTEP_IDS` pour une navigation claire. |
-| **Statut** | Les **deux** composants (`*.tsx` et `*-fixed.tsx`) sont maintenant protégés → plus de double-clic possible. |
+| **Statut** | Les **deux** composants sont maintenant protégés **et** le fichier obsolète a été renommé :`roof-surface-question-deprecated-do-not-use.tsx` (commit `b2117dc`).<br>→ plus de double-clic possible. Ce fichier pourra être supprimé lors d’un futur nettoyage. |
 
 > **Bonne pratique** : lorsqu’un correctif paraît inefficace, vérifier systématiquement **le chemin d’import réel** dans le routeur ou le composant parent afin de repérer d’éventuels doublons/fichiers morts.
 

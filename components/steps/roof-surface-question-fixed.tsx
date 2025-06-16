@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import type { SimulatorData } from "../rainwater-simulator"
 import { Check, HelpCircle, ChevronLeft } from "lucide-react"
 import { RulerIcon } from "lucide-react" // Declaring the RulerIcon variable
+import { useSingleFlight } from "@/lib/useSingleFlight"
+import { STEP_IDS, SUBSTEP_IDS } from "@/constants/steps"
 
 type RoofSurfaceQuestionProps = {
   data: SimulatorData
@@ -20,17 +22,19 @@ export default function RoofSurfaceQuestion({
   prevStep,
   goToStep,
 }: RoofSurfaceQuestionProps) {
-  const handleResponse = (knows: boolean) => {
-    // Update the parent state
+  // Core logic – executed once thanks to single-flight guard
+  const respondFn = (knows: boolean) => {
     updateData({ knowsRoofSurface: knows })
 
-    // Navigate directly without useEffect
     if (knows) {
-      goToStep(2, 2) // Redirect to roof surface input step (step 2, substep 2)
+      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
     } else {
-      goToStep(2, 3) // Redirect to address input step (step 2, substep 3)
+      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
     }
   }
+
+  // Protect against double-clicks
+  const [respond, isBusy] = useSingleFlight(respondFn)
 
   return (
     <div className="space-y-8">
@@ -55,7 +59,8 @@ export default function RoofSurfaceQuestion({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <button
               type="button"
-              onClick={() => handleResponse(true)}
+              onClick={() => respond(true)}
+              disabled={isBusy()}
               className="bg-white dark:bg-slate-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800 hover:border-[#1D40AF] dark:hover:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer w-full text-left"
             >
               <div className="flex items-center gap-4">
@@ -73,7 +78,8 @@ export default function RoofSurfaceQuestion({
 
             <button
               type="button"
-              onClick={() => handleResponse(false)}
+              onClick={() => respond(false)}
+              disabled={isBusy()}
               className="bg-white dark:bg-slate-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800 hover:border-[#1D40AF] dark:hover:border-blue-500 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer w-full text-left"
             >
               <div className="flex items-center gap-4">

@@ -69,6 +69,20 @@ type StepButtonsProps = {
 
 ---
 
+#### 1.4 Debugging : **Composants dupliqués**
+
+Durant la mise en place de la défense anti-double-clic, un problème subtil a été découvert :
+
+| Élément | Détail |
+|---------|--------|
+| **Problème** | Le correctif a été appliqué à `components/steps/roof-surface-question.tsx`, mais l’application charge en réalité `components/steps/roof-surface-question-fixed.tsx`. Les doubles-clics persistaient donc. |
+| **Cause racine** | `rainwater-simulator.tsx` importe la version *-fixed* :<br>`import RoofSurfaceQuestion from "./steps/roof-surface-question-fixed"` |
+| **Comment le détecter ?** | 1. Les logs indiquaient encore deux navigations.<br>2. Rechercher dans le projet `roof-surface-question-fixed` a révélé la duplication. |
+| **Correctif appliqué** | • Copié/porté le hook `useSingleFlight` sur `roof-surface-question-fixed.tsx`.<br>• Ajout de `disabled={isBusy()}` sur les boutons **Oui / Non**.<br>• Utilisation des constantes `STEP_IDS`/`SUBSTEP_IDS` pour une navigation claire. |
+| **Statut** | Les **deux** composants (`*.tsx` et `*-fixed.tsx`) sont maintenant protégés → plus de double-clic possible. |
+
+> **Bonne pratique** : lorsqu’un correctif paraît inefficace, vérifier systématiquement **le chemin d’import réel** dans le routeur ou le composant parent afin de repérer d’éventuels doublons/fichiers morts.
+
 ## 2. Navigation & état Adresse (P1)
 
 | Problème | Fichier | Correctif |

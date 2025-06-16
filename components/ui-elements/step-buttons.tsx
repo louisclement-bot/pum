@@ -9,6 +9,7 @@ type StepButtonsProps = {
   nextLabel?: string
   prevLabel?: string
   nextDisabled?: boolean
+  busy?: boolean
 }
 
 export default function StepButtons({
@@ -17,6 +18,7 @@ export default function StepButtons({
   nextLabel = "Suivant",
   prevLabel = "Précédent",
   nextDisabled = false,
+  busy = false,
 }: StepButtonsProps) {
   return (
     <div className="flex justify-between mt-8 md:mt-10">
@@ -43,12 +45,12 @@ export default function StepButtons({
               onNext()
             }
           }}
-          disabled={nextDisabled}
+          disabled={nextDisabled || busy}
           type="button"
           className="px-4 py-2 md:px-6 md:py-3 rounded-xl bg-[#1D40AF] hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:hover:scale-100 text-sm md:text-base"
         >
-          {nextLabel}
-          {nextLabel === "Suivant" && <ArrowRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />}
+          {busy ? "…" : nextLabel}
+          {!busy && nextLabel === "Suivant" && <ArrowRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />}
         </Button>
       )}
     </div>

@@ -5,7 +5,7 @@ import { useAddressSearch } from "@/contexts/AddressSearchContext"
 import { useEffect, useState } from "react"
 
 export default function ContinueButton() {
-  const { state, handleContinue } = useAddressSearch()
+  const { state, handleContinue, isBusy } = useAddressSearch()
   const { selectedBuildingId, isSearching, error } = state
   const [showError, setShowError] = useState(false)
 
@@ -26,7 +26,7 @@ export default function ContinueButton() {
     <div className="relative">
       <Button
         onClick={handleClick}
-        disabled={!selectedBuildingId || isSearching}
+        disabled={!selectedBuildingId || isSearching || isBusy()}
         className={`w-full mt-4 py-3 rounded-xl bg-[#1D40AF] hover:bg-blue-700 text-white transition-all duration-300 ${
           showError ? "animate-shake" : ""
         } ${!selectedBuildingId ? "opacity-50 cursor-not-allowed" : ""}`}

@@ -205,6 +205,20 @@ export default function RainwaterSimulator() {
     // Find the next valid substep
     for (let i = subStepId; i <= Math.max(...stepDef.subSteps.map((ss) => ss.id)); i++) {
       const subStepDef = stepDef.subSteps.find((ss) => ss.id === i)
+
+      // ────────────────────────────────
+      // Debug logging for garden surface (step 1 ‑ sub-step 2)
+      // Helps diagnose the “garden-only navigation” issue.
+      // ────────────────────────────────
+      if (stepId === 1 && i === 2) {
+        console.log(
+          `[DEBUG] Garden surface check – data.usages:`,
+          data.usages,
+          `| condition result:`,
+          data.usages.includes("garden"),
+        )
+      }
+
       if (subStepDef && (!subStepDef.condition || subStepDef.condition(data))) {
         return i
       }

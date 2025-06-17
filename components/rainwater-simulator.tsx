@@ -232,7 +232,10 @@ export default function RainwaterSimulator() {
     const stepDef = steps.find((s) => s.id === stepId)
     console.log(`Finding next valid substep for step ${stepId}, starting from substep ${subStepId}`)
     console.log(`Current data.knowsRoofSurface:`, dataRef.current.knowsRoofSurface)
-    if (!stepDef) return null
+    if (!stepDef) {
+      console.error(`[findNextValidSubStep] ERROR: No step definition found for stepId: ${stepId}. Available step IDs: ${steps.map(s => s.id).join(', ')}.`)
+      return null
+    }
 
     // Find the next valid substep
     for (let i = subStepId; i <= Math.max(...stepDef.subSteps.map((ss) => ss.id)); i++) {
@@ -393,6 +396,20 @@ export default function RainwaterSimulator() {
   // Helper function to go to a specific step
   const goToStep = useCallback(
     (stepId: number, subStepId = 1) => {
+      // ────────────────────────────────
+      // Debug: track every explicit navigation request
+      // ────────────────────────────────
+      console.log(
+        `[goToStep] INVOKED with stepId: ${stepId}, subStepId: ${subStepId}. ` +
+          `Current parent step: ${currentStep}, subStep: ${currentSubStep}`,
+      )
+
+      // Validate stepId to ensure it's a number and exists in the steps array
+      if (typeof stepId !== 'number' || !steps.find(s => s.id === stepId)) {
+        console.error(`[goToStep] ERROR: Invalid stepId received: ${stepId}. Navigation halted.`);
+        return;
+      }
+      
       // Add current position to history for back navigation
       setNavigationHistory((prev) => [...prev, { step: currentStep, subStep: currentSubStep }])
 

@@ -27,9 +27,9 @@ export default function RoofSurfaceQuestion({
     updateData({ knowsRoofSurface: knows })
 
     if (knows) {
-      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
     } else {
-      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
     }
   }
 

@@ -187,7 +187,26 @@ export default function RainwaterSimulator() {
   // Helper function to update data
   const updateData = useCallback((newData: Partial<SimulatorData>) => {
     console.log("[updateData] called with:", newData)
-    setData((prev) => ({ ...prev, ...newData }))
+
+    /* ------------------------------------------------------------------
+     * Merge the incoming partial update with the latest known simulator
+     * state (always available via `dataRef.current`).  We **must** update
+     * the ref synchronously here so that any navigation function executed
+     * immediately after this call can rely on `dataRef.current` containing
+     * the brand-new values.  The subsequent `setData` call will trigger
+     * the normal React render cycle so that `data` stays consistent.
+     * ------------------------------------------------------------------ */
+    const newCompleteData: SimulatorData = {
+      ...dataRef.current,
+      ...newData,
+    }
+
+    // 1.  Synchronously update the ref (makes the change visible *now*)
+    dataRef.current = newCompleteData
+    console.log("[updateData] dataRef.current synchronously updated to:", dataRef.current)
+
+    // 2.  Schedule state update so the component re-renders with latest data
+    setData(newCompleteData)
   }, [])
 
   // Helper function to get the current step definition

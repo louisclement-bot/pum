@@ -62,12 +62,12 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
       updatedData.householdSize = householdSize
     }
 
-    // First update the parent's data
+    // Commit the data synchronously so that navigation logic in the parent
+    // sees the latest values (parent now uses a ref so no flush is required)
     updateData(updatedData)
     console.log("[UsageSelection] Data sent to parent:", updatedData)
 
-    // Navigate immediately – parent now holds latest data via ref
-    console.log("[UsageSelection] Navigating with usages:", selectedUsages)
+    // Navigate based on current selections
     if (selectedUsages.includes("garden")) {
       goToStep(1, 2) // Garden surface sub-step
     } else {

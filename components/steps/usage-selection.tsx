@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import StepButtons from "../ui-elements/step-buttons"
 import NumberInput from "../ui-elements/number-input"
 import type { SimulatorData, UsageType } from "../rainwater-simulator"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Users } from "lucide-react"
 import { WateringPlantIcon } from "../icons/watering-plant-icon"
 import { ToiletIcon } from "../icons/toilet-icon"
@@ -38,15 +38,22 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
   }, [data.householdSize])
 
   const handleUsageToggle = (usage: UsageType) => {
+    console.log("[UsageSelection] Toggling usage:", usage, "currently selected:", selectedUsages)
     if (selectedUsages.includes(usage)) {
       setSelectedUsages(selectedUsages.filter((u) => u !== usage))
     } else {
       setSelectedUsages([...selectedUsages, usage])
     }
+    console.log("[UsageSelection] New selectedUsages (post-toggle):", [
+      ...(!selectedUsages.includes(usage) ? selectedUsages : selectedUsages.filter((u) => u !== usage)),
+      ...(selectedUsages.includes(usage) ? [] : [usage]),
+    ])
   }
 
-  // `safeNext` executes a fresh callback each time – ensures it sees the latest state
-  const [safeNext, isBusy] = useSingleFlight(async () => {
+  // Create a new function when selectedUsages or householdSize changes
+  // This ensures the function always sees the latest state values
+  const handleNext = useCallback(async () => {
+    console.log("[UsageSelection] handleNext executing with selectedUsages:", selectedUsages)
     const updatedData: Partial<SimulatorData> = {
       usages: selectedUsages,
     }
@@ -57,10 +64,15 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
     }
 
     // Commit the data synchronously so that navigation logic in the parent
-    // sees the latest values (prevents the “double-click on Suivant” bug).
-    flushSync(() => {
-      updateData(updatedData)
-    })
+    // sees the latest values (prevents the "double-click on Suivant" bug).
+    try {
+      flushSync(() => {
+        updateData(updatedData)
+      })
+      console.log("[UsageSelection] flushSync completed. Data sent to parent:", updatedData)
+    } catch (err) {
+      console.error("[UsageSelection] Error during flushSync/updateData:", err)
+    }
 
     // Navigate based on current selections
     if (selectedUsages.includes("garden")) {
@@ -68,7 +80,10 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
     } else {
       nextStep()
     }
-  })
+  }, [selectedUsages, householdSize, showHouseholdSize, updateData, goToStep, nextStep])
+
+  // Use the handleNext function with useSingleFlight
+  const [safeNext, isBusy] = useSingleFlight(handleNext)
 
   return (
     <div className="space-y-6 md:space-y-8">

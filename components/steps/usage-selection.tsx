@@ -14,7 +14,6 @@ import { WateringPlantIcon } from "../icons/watering-plant-icon"
 import { ToiletIcon } from "../icons/toilet-icon"
 import { WashingMachineIcon } from "../icons/washing-machine-icon"
 import { useSingleFlight } from "@/lib/useSingleFlight"
-import { flushSync } from "react-dom"
 
 type UsageSelectionProps = {
   data: SimulatorData
@@ -64,15 +63,9 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
     }
 
     // Commit the data synchronously so that navigation logic in the parent
-    // sees the latest values (prevents the "double-click on Suivant" bug).
-    try {
-      flushSync(() => {
-        updateData(updatedData)
-      })
-      console.log("[UsageSelection] flushSync completed. Data sent to parent:", updatedData)
-    } catch (err) {
-      console.error("[UsageSelection] Error during flushSync/updateData:", err)
-    }
+    // sees the latest values (parent now uses a ref so no flush is required)
+    updateData(updatedData)
+    console.log("[UsageSelection] Data sent to parent:", updatedData)
 
     // Navigate based on current selections
     if (selectedUsages.includes("garden")) {

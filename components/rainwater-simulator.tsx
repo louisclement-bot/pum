@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { ProgressBar } from "./progress-bar"
 import { MobileProgressBar } from "./mobile-progress-bar"
 import UsageSelection from "./steps/usage-selection"
@@ -70,6 +70,15 @@ export default function RainwaterSimulator() {
     usages: [],
   })
   const [navigationHistory, setNavigationHistory] = useState<{ step: number; subStep: number }[]>([])
+  
+  // Create a ref that always points to the current data
+  // This ensures navigation functions always have access to the latest data
+  const dataRef = useRef<SimulatorData>(data)
+  
+  // Update the ref whenever data changes
+  useEffect(() => {
+    dataRef.current = data
+  }, [data])
 
   const isMobile = useMediaQuery("(max-width: 768px)")
 
@@ -190,7 +199,7 @@ export default function RainwaterSimulator() {
     // Find the applicable substep based on conditions
     return stepDef.subSteps.find((ss) => {
       if (ss.id !== currentSubStep) return false
-      if (ss.condition) return ss.condition(data)
+      if (ss.condition) return ss.condition(dataRef.current) // Use dataRef.current instead of data
       return true
     })
   }
@@ -199,7 +208,7 @@ export default function RainwaterSimulator() {
   const findNextValidSubStep = (stepId: number, subStepId: number) => {
     const stepDef = steps.find((s) => s.id === stepId)
     console.log(`Finding next valid substep for step ${stepId}, starting from substep ${subStepId}`)
-    console.log(`Current data.knowsRoofSurface:`, data.knowsRoofSurface)
+    console.log(`Current data.knowsRoofSurface:`, dataRef.current.knowsRoofSurface) // Use dataRef.current
     if (!stepDef) return null
 
     // Find the next valid substep
@@ -208,18 +217,18 @@ export default function RainwaterSimulator() {
 
       // ────────────────────────────────
       // Debug logging for garden surface (step 1 ‑ sub-step 2)
-      // Helps diagnose the “garden-only navigation” issue.
+      // Helps diagnose the "garden-only navigation" issue.
       // ────────────────────────────────
       if (stepId === 1 && i === 2) {
         console.log(
           `[DEBUG] Garden surface check – data.usages:`,
-          data.usages,
+          dataRef.current.usages, // Use dataRef.current
           `| condition result:`,
-          data.usages.includes("garden"),
+          dataRef.current.usages.includes("garden"), // Use dataRef.current
         )
       }
 
-      if (subStepDef && (!subStepDef.condition || subStepDef.condition(data))) {
+      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) { // Use dataRef.current
         return i
       }
     }
@@ -234,7 +243,7 @@ export default function RainwaterSimulator() {
     // Find the previous valid substep
     for (let i = subStepId; i >= 1; i--) {
       const subStepDef = stepDef.subSteps.find((ss) => ss.id === i)
-      if (subStepDef && (!subStepDef.condition || subStepDef.condition(data))) {
+      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) { // Use dataRef.current
         return i
       }
     }
@@ -251,7 +260,7 @@ export default function RainwaterSimulator() {
 
     // Special case for step 2: If we're at sub-step 2 (manual input) and knowsRoofSurface is true,
     // skip directly to step 3 (Pluie)
-    if (currentStep === 2 && currentSubStep === 2 && data.knowsRoofSurface === true) {
+    if (currentStep === 2 && currentSubStep === 2 && dataRef.current.knowsRoofSurface === true) { // Use dataRef.current
       setCurrentStep(3)
       setCurrentSubStep(1)
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -295,7 +304,7 @@ export default function RainwaterSimulator() {
         window.scrollTo({ top: 0, behavior: "smooth" })
       }
     }
-  }, [currentStep, currentSubStep, data])
+  }, [currentStep, currentSubStep]) // Remove data dependency since we use dataRef.current
 
   // Helper function to go to previous step
   const prevStep = useCallback(() => {
@@ -325,7 +334,7 @@ export default function RainwaterSimulator() {
       }
     } else if (currentStep > 1) {
       // Special case: Skip garden surface step if garden is not selected
-      if (currentStep === 2 && !data.usages.includes("garden")) {
+      if (currentStep === 2 && !dataRef.current.usages.includes("garden")) { // Use dataRef.current
         // Skip back to step 1 (Besoins et usages)
         const prevStepId = 1
         const prevSubStepId = findPrevValidSubStep(prevStepId, 1)
@@ -350,7 +359,7 @@ export default function RainwaterSimulator() {
         }
       }
     }
-  }, [currentStep, currentSubStep, data, navigationHistory])
+  }, [currentStep, currentSubStep, navigationHistory]) // Remove data dependency since we use dataRef.current
 
   // Helper function to go to a specific step
   const goToStep = useCallback(
@@ -365,7 +374,7 @@ export default function RainwaterSimulator() {
         window.scrollTo({ top: 0, behavior: "smooth" })
       }
     },
-    [currentStep, currentSubStep, data],
+    [currentStep, currentSubStep], // Remove data dependency since we use dataRef.current
   )
 
   // Restart the simulator

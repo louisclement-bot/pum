@@ -58,7 +58,8 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
 
     // If garden is selected, go directly to step 1, substep 2 (Garden Surface)
     if (selectedUsages.includes("garden")) {
-      goToStep(1, 2) // Explicitly go to step 1, substep 2 (Garden Surface)
+      // Delay navigation to ensure `updateData` state is committed
+      setTimeout(() => goToStep(1, 2), 0)
     } else {
       // Otherwise, proceed with normal navigation (which will skip garden surface)
       nextStep()
@@ -143,8 +144,6 @@ type UsageCardProps = {
 }
 
 function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCardProps) {
-  const selectedUsages = [] // Declare the variable here
-
   return (
     <Card
       className={`overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg ${
@@ -153,7 +152,6 @@ function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCar
       onClick={onToggle}
     >
       <CardContent className="p-4 md:p-6 flex flex-col h-full">
-        {console.log("Current selected usages:", selectedUsages)}
         <div className="flex items-start space-x-3 md:space-x-4">
           <Checkbox
             id={id}

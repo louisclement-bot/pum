@@ -1,11 +1,22 @@
 "use client"
 
+/**
+ * @deprecated DO NOT USE THIS FILE
+ * 
+ * This component is NOT used by the application.
+ * The actual component used is: roof-surface-question-fixed.tsx
+ * 
+ * This file exists only for reference and should be removed in a future cleanup.
+ * Any modifications should be made to roof-surface-question-fixed.tsx instead.
+ * 
+ * See BUG_FIX_GUIDE.md section 1.4 for the full debugging story.
+ */
+
 import { Button } from "@/components/ui/button"
 import type { SimulatorData } from "../rainwater-simulator"
-import { Check, HelpCircle, ChevronLeft } from "lucide-react"
-import { RulerIcon } from "lucide-react" // Declaring the RulerIcon variable
-import { useSingleFlight } from "@/lib/useSingleFlight"
+import { RulerIcon as RulerSquare, Check, HelpCircle } from "lucide-react"
 import { STEP_IDS, SUBSTEP_IDS } from "@/constants/steps"
+import { useSingleFlight } from "@/lib/useSingleFlight"
 
 type RoofSurfaceQuestionProps = {
   data: SimulatorData
@@ -22,14 +33,14 @@ export default function RoofSurfaceQuestion({
   prevStep,
   goToStep,
 }: RoofSurfaceQuestionProps) {
-  // Core logic – executed once thanks to single-flight guard
+  // Core logic executed once thanks to the single-flight guard
   const respondFn = (knows: boolean) => {
     updateData({ knowsRoofSurface: knows })
 
     if (knows) {
-      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.MANUAL_SURFACE_INPUT)
     } else {
-      goToStep(STEP_IDS.SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
+      goToStep(STEP_IDS.ROOF_SURFACE, SUBSTEP_IDS.ADDRESS_INPUT)
     }
   }
 
@@ -51,7 +62,7 @@ export default function RoofSurfaceQuestion({
       <div className="p-6 md:p-8 rounded-2xl shadow-md max-w-2xl mx-auto border border-blue-100 dark:border-blue-800 bg-white dark:bg-slate-800">
         <div className="flex items-center justify-center mb-8">
           <div className="bg-blue-100 dark:bg-blue-800/50 p-4 rounded-full">
-            <RulerIcon className="h-8 w-8 md:h-10 md:w-10 text-[#1D40AF] dark:text-blue-400" />
+            <RulerSquare className="h-8 w-8 md:h-10 md:w-10 text-[#1D40AF] dark:text-blue-400" />
           </div>
         </div>
 
@@ -69,9 +80,6 @@ export default function RoofSurfaceQuestion({
                 </div>
                 <div>
                   <h3 className="font-semibold text-xl text-[#1D40AF] dark:text-blue-300">Oui</h3>
-                  <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                    Je vais saisir la surface manuellement
-                  </p>
                 </div>
               </div>
             </button>
@@ -88,7 +96,6 @@ export default function RoofSurfaceQuestion({
                 </div>
                 <div>
                   <h3 className="font-semibold text-xl text-[#1D40AF] dark:text-blue-300">Non</h3>
-                  <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">Rechercher à partir de mon adresse</p>
                 </div>
               </div>
             </button>
@@ -102,7 +109,6 @@ export default function RoofSurfaceQuestion({
           onClick={prevStep}
           className="px-6 py-2 md:py-3 rounded-xl border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-300"
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
           Précédent
         </Button>
       </div>

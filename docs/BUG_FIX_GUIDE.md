@@ -6,6 +6,14 @@ Les tâches sont priorisées ; chaque action cite : fichier, lignes approximativ
 
 ---
 
+> **Statut d’implémentation — juillet 2025**
+>
+> | Priorité | Domaine | Statut |
+> |----------|---------|--------|
+> | **P0**   | Défense anti-double-clic | ✅ Implémenté (commit `eff3200`, branche `droid/p0-anti-double-click-fixes`) |
+> | **P1**   | Navigation & Adresse     | 🔄 En cours |
+> | **P2**   | Calculs, UX, Aides       | ⏳ À faire |
+
 ## 1. Défense globale anti-double-clic (P0)
 
 ### 1.1  Hook générique `useSingleFlight`
@@ -61,6 +69,20 @@ type StepButtonsProps = {
 
 ---
 
+#### 1.4 Debugging : **Composants dupliqués**
+
+Durant la mise en place de la défense anti-double-clic, un problème subtil a été découvert :
+
+| Élément | Détail |
+|---------|--------|
+| **Problème** | Le correctif a été appliqué à `components/steps/roof-surface-question.tsx`, mais l’application charge en réalité `components/steps/roof-surface-question-fixed.tsx`. Les doubles-clics persistaient donc. |
+| **Cause racine** | `rainwater-simulator.tsx` importe la version *-fixed* :<br>`import RoofSurfaceQuestion from "./steps/roof-surface-question-fixed"` |
+| **Comment le détecter ?** | 1. Les logs indiquaient encore deux navigations.<br>2. Rechercher dans le projet `roof-surface-question-fixed` a révélé la duplication. |
+| **Correctif appliqué** | • Copié/porté le hook `useSingleFlight` sur `roof-surface-question-fixed.tsx`.<br>• Ajout de `disabled={isBusy()}` sur les boutons **Oui / Non**.<br>• Utilisation des constantes `STEP_IDS`/`SUBSTEP_IDS` pour une navigation claire. |
+| **Statut** | Les **deux** composants sont maintenant protégés **et** le fichier obsolète a été renommé :`roof-surface-question-deprecated-do-not-use.tsx` (commit `b2117dc`).<br>→ plus de double-clic possible. Ce fichier pourra être supprimé lors d’un futur nettoyage. |
+
+> **Bonne pratique** : lorsqu’un correctif paraît inefficace, vérifier systématiquement **le chemin d’import réel** dans le routeur ou le composant parent afin de repérer d’éventuels doublons/fichiers morts.
+
 ## 2. Navigation & état Adresse (P1)
 
 | Problème | Fichier | Correctif |
@@ -68,8 +90,58 @@ type StepButtonsProps = {
 | Retour arrière depuis la saisie CP bloque le formulaire | `components/rainwater-simulator.tsx` `prevStep` | Lorsque l’on recule de step 3 → 2 : `updateData({ annualRainfall: undefined })` |
 | CP & rainfall non réinitialisés | `components/steps/address-input.tsx` | `useEffect(()=>{ updateData({ postalCode: undefined, annualRainfall: undefined }); },[]);` |
 | Pluviométrie manquante après retour | `contexts/AddressSearchContext.tsx` `handleContinue` | Vérifier `annualRainfall`; si absent → erreur et pas de navigation. |
+| « Arrosage du jardin » seul → « Suivant » inactif | `components/steps/usage-selection.tsx` `handleNext` | Mettre à jour l’état **puis** naviguer : appeler `goToStep` _après_ `updateData` (ex. `setTimeout(()=>goToStep(1,2),0)` ou utiliser un `useEffect` déclenché sur `data.usages`). |
 
 ---
+
+### 2.5  Bug « Jardin exclusif » – le bouton **Suivant** ne réagit pas
+
+1. **Symptôme**  
+   • L’utilisateur coche uniquement « Arrosage du jardin », le bouton **Suivant** devient actif visuellement mais aucun passage à l’étape suivante ne se produit.  
+   • La console affiche `Current selected usages: []` en boucle, puis la logique de navigation cherche un sous-étape invalide.
+
+2. **Analyse – cause racine**  
+   *Dans `components/steps/usage-selection.tsx`* :  
+   ```tsx
+   function UsageCard({ … }) {
+     const selectedUsages = []   // ← VARIABLE LOCALE FANTÔME
+   ```
+   Cette variable masque (shadow) l’état remonté par le composant parent : `selectedUsages` reste donc **toujours vide** à l’intérieur du composant, les logs console sont trompeurs et la logique `handleNext` pense qu’aucun usage n’est sélectionné.
+
+3. **Lignes problématiques**  
+   ```tsx
+   // components/steps/usage-selection.tsx  (fin de fichier)
+   132: function UsageCard({ id, … }) {
+   133:   const selectedUsages = []   // <= à supprimer
+   ```
+
+4. **Étapes exactes du dysfonctionnement**  
+   1. L’utilisateur clique sur la carte « Jardin » → `handleUsageToggle("garden")` met à jour l’état parent.  
+   2. `UsageSelection` se re-render ; la carte se voit passer `checked={true}`.  
+   3. À l’intérieur de `UsageCard`, la variable locale `selectedUsages` est *recréée vide*, les logs affichent `[]`.  
+   4. Lors du clic sur **Suivant**, `handleNext` exécute `if (selectedUsages.includes("garden")) …` → la condition est fausse, la navigation classique passe par `nextStep()` qui est filtrée par la logique des sous-étapes (pas de surface jardin) et bloque.
+
+5. **Pistes de résolution**  
+   *Approche A – Minimaliste (recommandée)*  
+   • Supprimer la ligne fautive et n’utiliser que `checked` passé en props pour le rendu.  
+   ```diff
+     function UsageCard({ … }: UsageCardProps) {
+-      const selectedUsages = [] // Declare the variable here
+       return (
+   ```  
+   *Approche B*  
+   • Si des logs sont nécessaires, passer `selectedUsages` en prop au composant enfant.
+
+6. **Correctif recommandé**  
+   ```patch
+   *** Update File: components/steps/usage-selection.tsx
+   @@
+   -function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCardProps) {
+   -  const selectedUsages = [] // BUG : masque l’état réel
+   +function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCardProps) {
+   +  // Utiliser uniquement la prop `checked` pour savoir si la carte est sélectionnée
+   ```  
+   Aucune autre modification n’est nécessaire : `handleNext` fonctionnera alors et le routing vers `goToStep(1,2)` s’exécutera.
 
 ## 3. UX Adresse (P1)
 

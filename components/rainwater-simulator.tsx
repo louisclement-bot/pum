@@ -69,16 +69,19 @@ export default function RainwaterSimulator() {
   const [data, setData] = useState<SimulatorData>({
     usages: [],
   })
-  const [navigationHistory, setNavigationHistory] = useState<{ step: number; subStep: number }[]>([])
-  
-  // Create a ref that always points to the current data
-  // This ensures navigation functions always have access to the latest data
+
+  // ────────────────────────────────
+  // Keep a ref pointing to the latest `data`
+  // Helpful for debugging timing issues with stale closures.
+  // ────────────────────────────────
   const dataRef = useRef<SimulatorData>(data)
-  
-  // Update the ref whenever data changes
+
+  // Update the ref whenever the state changes and log the event
   useEffect(() => {
     dataRef.current = data
+    console.log("[dataRef] updated:", dataRef.current)
   }, [data])
+  const [navigationHistory, setNavigationHistory] = useState<{ step: number; subStep: number }[]>([])
 
   const isMobile = useMediaQuery("(max-width: 768px)")
 
@@ -183,6 +186,7 @@ export default function RainwaterSimulator() {
 
   // Helper function to update data
   const updateData = useCallback((newData: Partial<SimulatorData>) => {
+    console.log("[updateData] called with:", newData)
     setData((prev) => ({ ...prev, ...newData }))
   }, [])
 
@@ -199,7 +203,7 @@ export default function RainwaterSimulator() {
     // Find the applicable substep based on conditions
     return stepDef.subSteps.find((ss) => {
       if (ss.id !== currentSubStep) return false
-      if (ss.condition) return ss.condition(dataRef.current) // Use dataRef.current instead of data
+      if (ss.condition) return ss.condition(dataRef.current)
       return true
     })
   }
@@ -208,7 +212,7 @@ export default function RainwaterSimulator() {
   const findNextValidSubStep = (stepId: number, subStepId: number) => {
     const stepDef = steps.find((s) => s.id === stepId)
     console.log(`Finding next valid substep for step ${stepId}, starting from substep ${subStepId}`)
-    console.log(`Current data.knowsRoofSurface:`, dataRef.current.knowsRoofSurface) // Use dataRef.current
+    console.log(`Current data.knowsRoofSurface:`, dataRef.current.knowsRoofSurface)
     if (!stepDef) return null
 
     // Find the next valid substep
@@ -222,13 +226,19 @@ export default function RainwaterSimulator() {
       if (stepId === 1 && i === 2) {
         console.log(
           `[DEBUG] Garden surface check – data.usages:`,
-          dataRef.current.usages, // Use dataRef.current
-          `| condition result:`,
-          dataRef.current.usages.includes("garden"), // Use dataRef.current
+          dataRef.current.usages,
+          "| dataRef.usages:",
+          dataRef.current.usages,
+          `| condition result (from state):`,
+          dataRef.current.usages.includes("garden"),
+          `| condition result (from ref):`,
+          dataRef.current.usages.includes("garden"),
         )
       }
 
-      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) { // Use dataRef.current
+      // Use the up-to-date reference to ensure conditions are evaluated
+      // against the latest simulator state.
+      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) {
         return i
       }
     }
@@ -243,7 +253,7 @@ export default function RainwaterSimulator() {
     // Find the previous valid substep
     for (let i = subStepId; i >= 1; i--) {
       const subStepDef = stepDef.subSteps.find((ss) => ss.id === i)
-      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) { // Use dataRef.current
+      if (subStepDef && (!subStepDef.condition || subStepDef.condition(dataRef.current))) {
         return i
       }
     }
@@ -260,7 +270,7 @@ export default function RainwaterSimulator() {
 
     // Special case for step 2: If we're at sub-step 2 (manual input) and knowsRoofSurface is true,
     // skip directly to step 3 (Pluie)
-    if (currentStep === 2 && currentSubStep === 2 && dataRef.current.knowsRoofSurface === true) { // Use dataRef.current
+    if (currentStep === 2 && currentSubStep === 2 && dataRef.current.knowsRoofSurface === true) {
       setCurrentStep(3)
       setCurrentSubStep(1)
       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -304,7 +314,7 @@ export default function RainwaterSimulator() {
         window.scrollTo({ top: 0, behavior: "smooth" })
       }
     }
-  }, [currentStep, currentSubStep]) // Remove data dependency since we use dataRef.current
+  }, [currentStep, currentSubStep])
 
   // Helper function to go to previous step
   const prevStep = useCallback(() => {
@@ -334,7 +344,7 @@ export default function RainwaterSimulator() {
       }
     } else if (currentStep > 1) {
       // Special case: Skip garden surface step if garden is not selected
-      if (currentStep === 2 && !dataRef.current.usages.includes("garden")) { // Use dataRef.current
+      if (currentStep === 2 && !dataRef.current.usages.includes("garden")) {
         // Skip back to step 1 (Besoins et usages)
         const prevStepId = 1
         const prevSubStepId = findPrevValidSubStep(prevStepId, 1)
@@ -359,7 +369,7 @@ export default function RainwaterSimulator() {
         }
       }
     }
-  }, [currentStep, currentSubStep, navigationHistory]) // Remove data dependency since we use dataRef.current
+  }, [currentStep, currentSubStep, navigationHistory])
 
   // Helper function to go to a specific step
   const goToStep = useCallback(
@@ -374,7 +384,7 @@ export default function RainwaterSimulator() {
         window.scrollTo({ top: 0, behavior: "smooth" })
       }
     },
-    [currentStep, currentSubStep], // Remove data dependency since we use dataRef.current
+    [currentStep, currentSubStep],
   )
 
   // Restart the simulator

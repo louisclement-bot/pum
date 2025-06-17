@@ -62,6 +62,8 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
       // Delay navigation so that `data.usages` is up-to-date when
       // the router evaluates `condition: (data) => data.usages.includes("garden")`.
       setTimeout(() => goToStep(1, 2), 0) // Garden surface sub-step
+      // Delay navigation to ensure `updateData` state is committed
+      setTimeout(() => goToStep(1, 2), 0)
     } else {
       nextStep()
     }

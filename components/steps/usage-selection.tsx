@@ -66,15 +66,13 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
     updateData(updatedData)
     console.log("[UsageSelection] Data sent to parent:", updatedData)
 
-    // Then navigate after a small delay to ensure the parent has re-rendered with the new data
-    setTimeout(() => {
-      console.log("[UsageSelection] Navigating after delay with usages:", selectedUsages)
-      if (selectedUsages.includes("garden")) {
-        goToStep(1, 2) // Garden surface sub-step
-      } else {
-        nextStep()
-      }
-    }, 50) // Small delay to ensure state update has been processed
+    // Navigate immediately – parent now holds latest data via ref
+    console.log("[UsageSelection] Navigating with usages:", selectedUsages)
+    if (selectedUsages.includes("garden")) {
+      goToStep(1, 2) // Garden surface sub-step
+    } else {
+      nextStep()
+    }
   }, [selectedUsages, householdSize, showHouseholdSize, updateData, goToStep, nextStep])
 
   // Use the handleNext function with useSingleFlight

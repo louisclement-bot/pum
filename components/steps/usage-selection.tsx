@@ -44,30 +44,28 @@ export default function UsageSelection({ data, updateData, nextStep, goToStep }:
     }
   }
 
-  const handleNext = () => {
+  // `safeNext` executes a fresh callback each time – ensures it sees the latest state
+  const [safeNext, isBusy] = useSingleFlight(async () => {
     const updatedData: Partial<SimulatorData> = {
       usages: selectedUsages,
     }
 
-    // Only include household size if toilet or washing is selected
+    // Include household size only if relevant
     if (showHouseholdSize) {
       updatedData.householdSize = householdSize
     }
 
     updateData(updatedData)
 
-    // If garden is selected, go directly to step 1, substep 2 (Garden Surface)
+    // Navigate based on current selections
     if (selectedUsages.includes("garden")) {
-      // Delay navigation to ensure `updateData` state is committed
-      setTimeout(() => goToStep(1, 2), 0)
+      // Delay navigation so that `data.usages` is up-to-date when
+      // the router evaluates `condition: (data) => data.usages.includes("garden")`.
+      setTimeout(() => goToStep(1, 2), 0) // Garden surface sub-step
     } else {
-      // Otherwise, proceed with normal navigation (which will skip garden surface)
       nextStep()
     }
-  }
-
-  // Wrap handleNext with single-flight guard to prevent double clicks
-  const [safeNext, isBusy] = useSingleFlight(handleNext)
+  })
 
   return (
     <div className="space-y-6 md:space-y-8">

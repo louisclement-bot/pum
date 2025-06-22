@@ -28,6 +28,10 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
   )
+  // New state for location modification
+  const [showLocationInput, setShowLocationInput] = useState<boolean>(false)
+  const [newPostalCode, setNewPostalCode] = useState<string>(postalCode)
+  const [newCity, setNewCity] = useState<string>(data.city || "")
 
   // If we already have address data, fetch rainfall on component mount
   useEffect(() => {
@@ -150,6 +154,51 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     }
   }
 
+  // ---- LOCATION MODIFICATION HANDLERS ----
+  const handleModifyLocation = () => {
+    // Prefill with current values
+    setNewPostalCode(postalCode)
+    setNewCity(data.city || "")
+    setShowLocationInput(true)
+  }
+
+  const handleCancelLocationModification = () => {
+    setShowLocationInput(false)
+  }
+
+  const handleSaveLocation = () => {
+    if (!newPostalCode.trim()) return
+
+    // Persist changes
+    const cleanedPostal = newPostalCode.trim()
+
+    /* ------------------------------------------------------------------
+     * 1. Clear every value that depended on the previous localisation.
+     * ------------------------------------------------------------------ */
+    setPostalCode(cleanedPostal)
+    setCoordinates(null)             // ⤷ avoid re-using old coords
+    setRainfall(0)                   // ⤷ force UI refresh
+    setDataSource("none")
+
+    // Propagate the reset to the global SimulatorData
+    updateData({
+      postalCode: cleanedPostal,
+      city: newCity.trim(),
+      latitude: undefined,
+      longitude: undefined,
+      annualRainfall: undefined,
+      detailedPrecipitationData: undefined,
+      rainfallDataSource: undefined,
+    })
+
+    /* ------------------------------------------------------------------
+     * 2. Trigger a fresh fetch with the new postal code.
+     * ------------------------------------------------------------------ */
+    fetchRainfall(cleanedPostal)
+
+    setShowLocationInput(false)
+  }
+
   const handleManualInputSubmit = () => {
     const value = Number.parseFloat(manualRainfall)
     if (!isNaN(value) && value > 0) {
@@ -217,14 +266,61 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           </div>
         </div>
 
-        {data.city ? (
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center mb-8">
-            <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
-              <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
+        {showLocationInput ? (
+          /* ---------- LOCATION EDIT FORM ---------- */
+          <div className="space-y-4 max-w-md mx-auto mb-8">
+            <div className="space-y-2">
+              <Label htmlFor="new-postal-code" className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                Code postal
+              </Label>
+              <Input
+                id="new-postal-code"
+                value={newPostalCode}
+                onChange={(e) => setNewPostalCode(e.target.value)}
+                placeholder="75017"
+                className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl"
+              />
             </div>
-            <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
-              Basé sur votre adresse à <span className="font-bold">{data.city}</span>
-            </p>
+            <div className="space-y-2">
+              <Label htmlFor="new-city" className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                Ville (optionnel)
+              </Label>
+              <Input
+                id="new-city"
+                value={newCity}
+                onChange={(e) => setNewCity(e.target.value)}
+                placeholder="Paris"
+                className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={handleCancelLocationModification}>
+                Annuler
+              </Button>
+              <Button onClick={handleSaveLocation} disabled={isLoading || !newPostalCode.trim()}>
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        ) : data.city ? (
+          /* ---------- LOCATION DISPLAY WITH MODIFY BUTTON ---------- */
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
+                <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
+              </div>
+              <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                Basé sur votre adresse à <span className="font-bold">{data.city}</span>
+              </p>
+            </div>
+            <Button
+              onClick={handleModifyLocation}
+              variant="link"
+              className="text-blue-600 dark:text-blue-400"
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Modifier l&apos;emplacement
+            </Button>
           </div>
         ) : (
           <div className="space-y-4 max-w-md mx-auto mb-8">

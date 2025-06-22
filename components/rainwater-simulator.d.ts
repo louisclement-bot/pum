@@ -22,6 +22,9 @@ export type SimulatorData = {
   potentialSavingsEuros: number
   coverageRate: number
 
+  // Origin of the rainfall value (e.g. "OpenMeteo API", "USER_INPUT", …)
+  rainfallDataSource?: string
+
   // New fields for coordinates and detailed precipitation data
   latitude?: number
   longitude?: number

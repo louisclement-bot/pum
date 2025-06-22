@@ -218,13 +218,32 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
         </div>
 
         {data.city ? (
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center mb-8">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center justify-between mb-8">
             <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
               <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
             </div>
-            <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
-              Basé sur votre adresse à <span className="font-bold">{data.city}</span>
-            </p>
+            <div className="flex-grow">
+              <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                Basé sur votre adresse à <span className="font-bold">{data.city}</span>
+              </p>
+            </div>
+            {!manualInput && (
+              <Button
+                variant="link"
+                onClick={() => {
+                  setManualInput(true)
+                  // Optionally clear fetched rainfall if switching to manual
+                  // setRainfall(0);
+                  // setDataSource("USER_INPUT");
+                  // setManualRainfall(rainfall > 0 ? rainfall.toString() : ""); // Pre-fill with fetched value
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 ml-4 flex items-center"
+                aria-label="Modifier manuellement la pluviométrie"
+              >
+                <Edit3 className="h-4 w-4 mr-1" />
+                Modifier manuellement
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-4 max-w-md mx-auto mb-8">

@@ -53,15 +53,23 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
           data.usages || [],
           3, // Limit to 3 tanks
         )
-        setRecommendedTanks(tanks)
+        // If the JSON file couldn't be fetched, productService returns an empty array.
+        // In that case we silently fall back to local dummy data instead of showing an error.
+        if (tanks.length === 0) {
+          setRecommendedTanks(getTankRecommendations(data.recommendedTankSize || 0))
+          setAllTanks(getTankRecommendations(data.recommendedTankSize || 0)) // use same dummy list for “see more”
+          setRecommendedPumps(getPumpRecommendations(data.usages || []))
+        } else {
+          setRecommendedTanks(tanks)
 
-        // Get all tanks for "View More" functionality
-        const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
-        setAllTanks(allTankOptions)
+          // Get all tanks for "View More" functionality
+          const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
+          setAllTanks(allTankOptions)
 
-        // Get compatible pumps based on usage
-        const pumps = await getCompatiblePumps(data.usages || [])
-        setRecommendedPumps(pumps)
+          // Get compatible pumps based on usage
+          const pumps = await getCompatiblePumps(data.usages || [])
+          setRecommendedPumps(pumps)
+        }
       } catch (error) {
         console.error("Error loading product recommendations:", error)
         setError("Impossible de charger les produits recommandés. Veuillez réessayer.")

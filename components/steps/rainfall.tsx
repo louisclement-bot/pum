@@ -25,6 +25,8 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const [manualInput, setManualInput] = useState<boolean>(false)
   const [manualRainfall, setManualRainfall] = useState<string>("")
   const [dataSource, setDataSource] = useState<string>("none")
+  // Early-fetch of financial aids
+  const [fetchingAids, setFetchingAids] = useState<boolean>(false)
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
   )
@@ -212,6 +214,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   }
 
   const handleNext = async () => {
+    // Avoid double trigger
+    if (fetchingAids) return
+
     // Prepare data update object
     const dataUpdate: Partial<SimulatorData> = {
       annualRainfall: rainfall,
@@ -241,6 +246,35 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       } catch (error) {
         console.error("[DATA SOURCE] Error fetching detailed precipitation data:", error)
       }
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+     * Early fetch of financial aids (offline-first approach)
+     * We use the official proxy route `/api/financial-aid` so that all
+     * auth logic & INSEE resolution are centralized in one place.
+     * ---------------------------------------------------------------- */
+    try {
+      setFetchingAids(true)
+
+      const paramString = data.citycode
+        ? `codeInsee=${data.citycode}`
+        : `postcode=${postalCode || data.postalCode}`
+
+      const res = await fetch(`/api/financial-aid?${paramString}`)
+      if (res.ok) {
+        const json = await res.json()
+        dataUpdate.financialAids = Array.isArray(json.aids) ? json.aids : []
+        console.log(`[AID_FETCH] success – received ${dataUpdate.financialAids.length} aids`)
+      } else {
+        // Any non-200 is logged but not blocking
+        console.error("[AID_FETCH] error status:", res.status)
+        dataUpdate.financialAids = []
+      }
+    } catch (e) {
+      console.error("[AID_FETCH] network/error:", e)
+      dataUpdate.financialAids = []
+    } finally {
+      setFetchingAids(false)
     }
 
     console.log("[DATA SOURCE] Updating SimulatorData with rainfall data source:", dataSource)
@@ -458,9 +492,16 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       <StepButtons
         onNext={handleNext}
         onPrev={prevStep}
-        nextDisabled={!rainfall || rainfall <= 0}
+        nextDisabled={!rainfall || rainfall <= 0 || fetchingAids}
         nextLabel="Continuer"
       />
+
+      {/* Discrete loader while fetching financial aids */}
+      {fetchingAids && (
+        <div className="flex justify-center mt-4">
+          <Loader2 className="h-6 w-6 animate-spin text-[#1D40AF] dark:text-blue-400" />
+        </div>
+      )}
     </div>
   )
 }

@@ -5,7 +5,7 @@ import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
-import { useState, useEffect } from "react"
+import React from "react"
 import { Euro, Building, MapPin, Info } from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
@@ -16,56 +16,11 @@ type FinancialAidProps = {
 }
 
 export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidProps) {
-  const [aids, setAids] = useState<Aid[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchAids = async () => {
-      // Reset states
-      setIsLoading(true)
-      setError(null)
-      setAids([])
-
-      const postcode = data.postalCode
-
-      // AidesFi API needs the *postal code* so it can resolve the authoritative
-      // INSEE code internally. If we don't have it, we cannot continue.
-      if (!postcode) {
-        setError("Code postal manquant – impossible de rechercher les aides financières.")
-        setIsLoading(false)
-        return
-      }
-
-      const params = new URLSearchParams()
-      params.append("postcode", postcode)
-
-      try {
-        console.debug("[FinancialAid] Fetching aids with postalCode:", postcode)
-        const res = await fetch(`/api/financial-aid?${params.toString()}`)
-        const json = await res.json()
-
-        if (!res.ok) {
-          // API error propagated
-          throw new Error(json.error || "Erreur inconnue")
-        }
-
-        if (Array.isArray(json.aids)) {
-          setAids(json.aids)
-        } else {
-          setAids([])
-        }
-      } catch (e: any) {
-        console.error("[FinancialAid] Error while fetching aids:", e)
-        setError(e.message || "Une erreur est survenue lors de la récupération des aides.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchAids()
-    // Depend on postalCode / citycode changes
-  }, [data.postalCode])
+  // Offline-first: rely on early-fetched data coming from SimulatorData
+  const aids: Aid[] = data.financialAids ?? []
+  const isLoading = data.financialAids === undefined
+  // Placeholder for potential future error propagation via SimulatorData
+  const error: string | null = null
 
   return (
     <div className="space-y-8">

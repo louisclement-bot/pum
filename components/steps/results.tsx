@@ -33,8 +33,13 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
     })
   }
 
-  // Check if we have postal code to enable financial aid button
-  const canShowFinancialAid = !!data.postalCode
+  // ------------------------------------------------------------------
+  // Financial aid button – early-fetch aware
+  // ------------------------------------------------------------------
+  // Prefer the freshly fetched aids if present, otherwise keep the old
+  // postal-code fallback so the UX isn’t broken if the early fetch fails.
+  const aidsCount = data.financialAids?.length ?? 0
+  const canShowFinancialAid = aidsCount > 0 || !!data.postalCode
 
   // Animation variants
   const containerVariants = {
@@ -227,15 +232,26 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           Précédent
         </Button>
 
-        {canShowFinancialAid && (
-          <Button
-            onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
-            className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
-          >
-            Voir les aides disponibles
-            <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
-          </Button>
-        )}
+        {canShowFinancialAid &&
+          (aidsCount > 0 ? (
+            <Button
+              onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
+              className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
+            >
+              {`Voir les ${aidsCount} aide${aidsCount > 1 ? "s" : ""} disponibles`}
+              <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+            </Button>
+          ) : (
+            !!data.postalCode && (
+              <Button
+                onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
+                className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
+              >
+                Voir les aides disponibles
+                <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+              </Button>
+            )
+          ))}
 
         <Button
           onClick={() => goToStep(STEP_IDS.PRODUCTS)}

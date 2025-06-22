@@ -129,13 +129,29 @@ export function formatAmount(montantCalcule: number | null, montants: ApiAidAmou
  * @param groupeRacine - The groupe_racine array from the API
  * @returns Formatted conditions string
  */
-export function formatConditions(groupeRacine: ApiAidGroup[]): string {
-  if (!groupeRacine || groupeRacine.length === 0) {
+export function formatConditions(
+  groupeRacine: ApiAidGroup | ApiAidGroup[] | null | undefined,
+): string {
+  /* ------------------------------------------------------------------
+   * 1. Normalise input                                                *
+   * ------------------------------------------------------------------ */
+  if (!groupeRacine) {
     return "Conditions non spécifiées"
   }
-  
-  // Extract all condition labels and join them
-  const conditions = groupeRacine
+
+  // Convert to array safely
+  const groups: ApiAidGroup[] = Array.isArray(groupeRacine)
+    ? groupeRacine.filter(Boolean)
+    : [groupeRacine]
+
+  if (groups.length === 0) {
+    return "Conditions non spécifiées"
+  }
+
+  /* ------------------------------------------------------------------
+   * 2. Extract all condition labels and join them                      *
+   * ------------------------------------------------------------------ */
+  const conditions = groups
     .flatMap(group => group.conditions || [])
     .map(condition => condition.libelle)
     .filter(Boolean)
@@ -199,8 +215,22 @@ export function mapApiAidsToUiAids(apiResponse: FinancialAidApiResponse): Aid[] 
       name: apiAid.libelle,
       organization: apiAid.libelle_programme,
       amount: formatAmount(apiAid.montant_calcule, apiAid.montants),
+      // Conditions (formatConditions now internally normalises object/array)
       conditions: formatConditions(apiAid.groupe_racine),
       icon: determineIcon(apiAid),
+
+      // ────────────────────────────────────────────────────────────
+      // NEW FIELDS (displayed in the detailed UI card)
+      // ────────────────────────────────────────────────────────────
+      description: apiAid.description,
+      programDescription: apiAid.description_programme ?? undefined,
+      website: apiAid.site ?? undefined,
+      documentationLink: apiAid.lien_documentation ?? undefined,
+      address: apiAid.adresse ?? apiAid.adresse2 ?? undefined,
+      city: apiAid.ville ?? undefined,
+      postalCode: apiAid.code_postal ?? undefined,
+      phone: apiAid.telephone ?? undefined,
+      email: apiAid.mail ?? undefined,
     }
     
     return aid

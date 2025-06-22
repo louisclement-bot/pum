@@ -106,75 +106,45 @@ export async function getFinancialAids(codeInsee: string): Promise<FinancialAidA
  * @returns Formatted amount string
  */
 export function formatAmount(montantCalcule: number | null, montants: ApiAidAmount[]): string {
-  // ------------------------------------------------------------------
-  // 1. montant_calcule – when the API already computed the grant
-  // ------------------------------------------------------------------
   if (montantCalcule !== null && montantCalcule > 0) {
-    // Use ≈ to indicate that this value is an estimate, not a strict ceiling
-    return `≈ ${montantCalcule.toLocaleString()} €`
+    return `Jusqu'à ${montantCalcule.toLocaleString()}€`
   }
-
-  // ------------------------------------------------------------------
-  // 2. Analyse des entrées “montants[]”
-  //    L’API mélange :
-  //      • type = FORFAITAIRE  -> valeur / valeur_max en euros
-  //      • type = POURCENTAGE  -> valeur / valeur_max en %
-  //      Dans le second cas un “plafond” (euros) peut être indiqué.
-  // ------------------------------------------------------------------
-  if (!montants || montants.length === 0) {
-    return "Montant variable"
-  }
-
-  const parts = montants.map((m) => {
-    // ----- 2.a  – POURCENTAGE ---------------------------------------
-    if (m.type === "POURCENTAGE") {
-      const pct =
-        m.valeur_max && m.valeur_max > m.valeur
-          ? `${m.valeur}-${m.valeur_max}%`
-          : `${m.valeur}%`
-
-      // Ajoute le plafond s’il existe
-      const plafond =
-        m.plafond && m.plafond.valeur
-          ? ` (plafond ${m.plafond.valeur.toLocaleString()} €)`
-          : ""
-
-      return `${pct}${plafond}`
+  
+  if (montants && montants.length > 0) {
+    const highestAmount = montants.reduce((max, current) => {
+      const value = current.valeur_max || current.valeur
+      return value > max ? value : max
+    }, 0)
+    
+    if (highestAmount > 0) {
+      return `Jusqu'à ${highestAmount.toLocaleString()}€`
     }
-
-    // ----- 2.b  – FORFAITAIRE ---------------------------------------
-    const amount = m.valeur_max && m.valeur_max > m.valeur ? m.valeur_max : m.valeur
-    return `Jusqu'à ${amount.toLocaleString()} €`
-  })
-
-  // Supprime les doublons éventuels et assemble la phrase finale
-  const uniqueParts = [...new Set(parts)]
-  return uniqueParts.join(" / ")
+  }
+  
+  return "Montant variable"
 }
 
 /**
  * Format the conditions string based on API data
- * The API can return either an **object** or an **array** for `groupe_racine`.
- * We first normalise the payload, then build a readable list of condition labels.
- *
- * @param groupeRacine - The `groupe_racine` field from the API (object OR array)
+ * @param groupeRacine - The groupe_racine array from the API
  * @returns Formatted conditions string
  */
-function extractConditions(groupe: ApiAidGroup | ApiAidGroup[] | undefined | null): string[] {
-  if (!groupe) return []
-
-  // Normalise to array (API sometimes returns a single object)
-  const list = Array.isArray(groupe) ? groupe : [groupe]
-
-  return list
-    .flatMap((g) => g?.conditions ?? [])
-    .map((c) => c?.libelle)
-    .filter(Boolean) as string[]
-}
-
-export function formatConditions(groupeRacine: ApiAidGroup | ApiAidGroup[] | undefined | null): string {
-  const labels = extractConditions(groupeRacine)
-  return labels.length ? labels.join("; ") : "Conditions non spécifiées"
+export function formatConditions(groupeRacine: ApiAidGroup[]): string {
+  if (!groupeRacine || groupeRacine.length === 0) {
+    return "Conditions non spécifiées"
+  }
+  
+  // Extract all condition labels and join them
+  const conditions = groupeRacine
+    .flatMap(group => group.conditions || [])
+    .map(condition => condition.libelle)
+    .filter(Boolean)
+  
+  if (conditions.length === 0) {
+    return "Conditions non spécifiées"
+  }
+  
+  return conditions.join("; ")
 }
 
 /**
@@ -229,8 +199,26 @@ export function mapApiAidsToUiAids(apiResponse: FinancialAidApiResponse): Aid[] 
       name: apiAid.libelle,
       organization: apiAid.libelle_programme,
       amount: formatAmount(apiAid.montant_calcule, apiAid.montants),
-      conditions: formatConditions(apiAid.groupe_racine),
+      // `groupe_racine` can be either an array or an object – normalise to array
+      conditions: formatConditions(
+        Array.isArray(apiAid.groupe_racine)
+          ? apiAid.groupe_racine
+          : [apiAid.groupe_racine],
+      ),
       icon: determineIcon(apiAid),
+
+      // ────────────────────────────────────────────────────────────
+      // NEW FIELDS (displayed in the detailed UI card)
+      // ────────────────────────────────────────────────────────────
+      description: apiAid.description,
+      programDescription: apiAid.description_programme ?? undefined,
+      website: apiAid.site ?? undefined,
+      documentationLink: apiAid.lien_documentation ?? undefined,
+      address: apiAid.adresse ?? apiAid.adresse2 ?? undefined,
+      city: apiAid.ville ?? undefined,
+      postalCode: apiAid.code_postal ?? undefined,
+      phone: apiAid.telephone ?? undefined,
+      email: apiAid.mail ?? undefined,
     }
     
     return aid

@@ -111,6 +111,25 @@ export interface Aid {
   amount: string
   conditions: string
   icon: React.ReactNode
+
+  /** Detailed description of the aid */
+  description: string
+
+  /** Long description of the overarching programme (optional) */
+  programDescription?: string
+
+  /** Official web page of the aid (optional) */
+  website?: string
+
+  /** PDF or external documentation link (optional) */
+  documentationLink?: string
+
+  /** Contact & localisation information (all optional) */
+  address?: string
+  city?: string
+  postalCode?: string | number
+  phone?: string
+  email?: string
 }
 
 /**

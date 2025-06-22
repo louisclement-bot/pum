@@ -327,23 +327,25 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
           Imprimer
         </Button>
 
+        {/* Recommencer – now outline */}
         <Button
           variant="outline"
-          onClick={() => {
-            window.open("https://www.mypum.fr/agence", "_blank")
-          }}
-          className="flex-1 sm:flex-none py-2 md:py-6 border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 text-sm md:text-base"
-        >
-          <MapPin className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
-          Trouver un point de vente
-        </Button>
-
-        <Button
           onClick={restart}
-          className="flex-1 sm:flex-none py-2 md:py-6 bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
+          className="flex-1 sm:flex-none py-2 md:py-6 border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 text-sm md:text-base"
         >
           <RefreshCw className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
           Recommencer
+        </Button>
+
+        {/* Trouver un point de vente – now primary & right-most */}
+        <Button
+          onClick={() => {
+            window.open("https://www.mypum.fr/agence", "_blank")
+          }}
+          className="flex-1 sm:flex-none py-2 md:py-6 bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
+        >
+          <MapPin className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
+          Trouver un point de vente
         </Button>
       </div>
     </div>

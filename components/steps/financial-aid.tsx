@@ -6,16 +6,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState, useEffect } from "react"
-import { Euro, Building, MapPin, Info } from "lucide-react"
+import { Euro, Building, MapPin, Info, Edit3 } from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
   data: SimulatorData
   nextStep: () => void
   prevStep: () => void
+  /** Navigate to a specific simulator step (stepId, subStepId) */
+  goToStep?: (step: number, subStep?: number) => void
 }
 
-export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidProps) {
+export default function FinancialAid({ data, nextStep, prevStep, goToStep }: FinancialAidProps) {
   const [aids, setAids] = useState<Aid[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -78,6 +80,32 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
           de pluie.
         </p>
       </div>
+
+      {/* ────────────────────────────────
+         Location information + manual edit
+         Shown only when a city is already known
+         ──────────────────────────────── */}
+      {data.city && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex flex-col items-start max-w-3xl mx-auto">
+          <div className="flex items-center">
+            <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
+              <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
+            </div>
+            <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
+              Basé sur votre adresse à <span className="font-bold">{data.city}</span>
+            </p>
+          </div>
+
+          <Button
+            variant="link"
+            onClick={() => goToStep?.(2, 3)}
+            className="mt-3 text-blue-600 dark:text-blue-400"
+          >
+            <Edit3 className="h-4 w-4 mr-2" />
+            Modifier manuellement
+          </Button>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-4 max-w-3xl mx-auto">

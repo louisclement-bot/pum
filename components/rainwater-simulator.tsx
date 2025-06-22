@@ -467,9 +467,7 @@ export default function RainwaterSimulator() {
             <div className="flex items-center justify-center">
               <PumLogo width={96} height={48} />
             </div>
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 leading-tight">
-              Configurateur de cuve d&apos;eau de pluie
-            </h1>
+            
           </div>
 
           {/* Theme toggle */}

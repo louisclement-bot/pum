@@ -5,8 +5,8 @@ import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
-import { useState } from "react"
-import { Euro, Building, MapPin, Info, ExternalLink, ChevronDown, ChevronUp, Phone, Mail, FileText } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Euro, Building, MapPin, Info } from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
@@ -16,22 +16,56 @@ type FinancialAidProps = {
 }
 
 export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidProps) {
-  // Offline-first: rely on early-fetched data coming from SimulatorData
-  const aids: Aid[] = data.financialAids ?? []
-  const isLoading = data.financialAids === undefined
-  // Placeholder for potential future error propagation via SimulatorData
-  const error: string | null = null
-  
-  // State to track expanded aid cards
-  const [expandedAids, setExpandedAids] = useState<Record<string, boolean>>({})
-  
-  // Toggle expanded state for an aid
-  const toggleExpand = (aidId: string) => {
-    setExpandedAids(prev => ({
-      ...prev,
-      [aidId]: !prev[aidId]
-    }))
-  }
+  const [aids, setAids] = useState<Aid[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAids = async () => {
+      // Reset states
+      setIsLoading(true)
+      setError(null)
+      setAids([])
+
+      const postcode = data.postalCode
+
+      // AidesFi API needs the *postal code* so it can resolve the authoritative
+      // INSEE code internally. If we don't have it, we cannot continue.
+      if (!postcode) {
+        setError("Code postal manquant – impossible de rechercher les aides financières.")
+        setIsLoading(false)
+        return
+      }
+
+      const params = new URLSearchParams()
+      params.append("postcode", postcode)
+
+      try {
+        console.debug("[FinancialAid] Fetching aids with postalCode:", postcode)
+        const res = await fetch(`/api/financial-aid?${params.toString()}`)
+        const json = await res.json()
+
+        if (!res.ok) {
+          // API error propagated
+          throw new Error(json.error || "Erreur inconnue")
+        }
+
+        if (Array.isArray(json.aids)) {
+          setAids(json.aids)
+        } else {
+          setAids([])
+        }
+      } catch (e: any) {
+        console.error("[FinancialAid] Error while fetching aids:", e)
+        setError(e.message || "Une erreur est survenue lors de la récupération des aides.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchAids()
+    // Depend on postalCode / citycode changes
+  }, [data.postalCode])
 
   return (
     <div className="space-y-8">
@@ -40,7 +74,7 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
           Aides financières disponibles dans votre région
         </h2>
         <p className="text-blue-600 dark:text-blue-400 max-w-2xl mx-auto text-sm md:text-base">
-          Découvrez les aides financières auxquelles vous pourriez être éligible pour votre projet de récupération d&apos;eau
+          Découvrez les aides financières auxquelles vous pourriez être éligible pour votre projet de récupération d'eau
           de pluie.
         </p>
       </div>
@@ -97,108 +131,6 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
                       </div>
                       <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
                     </div>
-                    
-                    {/* Expand/Collapse button */}
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => toggleExpand(aid.id)}
-                      className="w-full mt-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                    >
-                      <span className="flex items-center">
-                        {expandedAids[aid.id] ? (
-                          <>Moins de détails <ChevronUp className="ml-2 h-4 w-4" /></>
-                        ) : (
-                          <>Plus de détails <ChevronDown className="ml-2 h-4 w-4" /></>
-                        )}
-                      </span>
-                    </Button>
-                    
-                    {/* Expanded details */}
-                    {expandedAids[aid.id] && (
-                      <div className="mt-4 space-y-4 pt-4 border-t border-blue-100 dark:border-blue-800">
-                        {/* Description */}
-                        {aid.description && (
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-[#1D40AF] dark:text-blue-300">Description</h4>
-                            <p className="text-gray-700 dark:text-gray-300 text-sm">{aid.description}</p>
-                          </div>
-                        )}
-                        
-                        {/* Program description */}
-                        {aid.programDescription && (
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-[#1D40AF] dark:text-blue-300">À propos du programme</h4>
-                            <p className="text-gray-700 dark:text-gray-300 text-sm">{aid.programDescription}</p>
-                          </div>
-                        )}
-                        
-                        {/* Links */}
-                        <div className="flex flex-wrap gap-2">
-                          {aid.website && (
-                            <a 
-                              href={aid.website} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                            >
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Site officiel
-                            </a>
-                          )}
-                          
-                          {aid.documentationLink && (
-                            <a 
-                              href={aid.documentationLink} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                            >
-                              <FileText className="mr-2 h-4 w-4" />
-                              Documentation
-                            </a>
-                          )}
-                        </div>
-                        
-                        {/* Contact information */}
-                        {(aid.address || aid.city || aid.postalCode || aid.phone || aid.email) && (
-                          <div className="space-y-2 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-md">
-                            <h4 className="font-medium text-[#1D40AF] dark:text-blue-300">Contact</h4>
-                            
-                            {(aid.address || aid.city || aid.postalCode) && (
-                              <div className="flex items-start">
-                                <MapPin className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2 mt-0.5" />
-                                <div>
-                                  {aid.address && <p className="text-sm text-gray-700 dark:text-gray-300">{aid.address}</p>}
-                                  {(aid.city || aid.postalCode) && (
-                                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                                      {aid.postalCode} {aid.city}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                            
-                            {aid.phone && (
-                              <div className="flex items-center">
-                                <Phone className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
-                                <a href={`tel:${aid.phone}`} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                  {aid.phone}
-                                </a>
-                              </div>
-                            )}
-                            
-                            {aid.email && (
-                              <div className="flex items-center">
-                                <Mail className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
-                                <a href={`mailto:${aid.email}`} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                  {aid.email}
-                                </a>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardContent>
@@ -236,19 +168,18 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
         </div>
       )}
 
-      {/* Updated button section - "Voir les produits recommandés" moved to the right */}
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
+      <div className="flex flex-col sm:flex-row gap-4 mt-10">
         <Button
           variant="outline"
           onClick={prevStep}
-          className="py-2 md:py-3 px-6 rounded-xl border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-300"
+          className="flex-1 sm:flex-none py-2 md:py-3 px-6 rounded-xl border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-300"
         >
           Précédent
         </Button>
 
         <Button
           onClick={nextStep}
-          className="py-2 md:py-3 px-6 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+          className="flex-1 sm:flex-none py-2 md:py-3 px-6 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
         >
           Voir les produits recommandés
         </Button>

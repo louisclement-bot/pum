@@ -18,7 +18,6 @@ import { ThemeToggle } from "./ui-elements/theme-toggle"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { PumLogo } from "./ui-elements/pum-logo"
 import type { JSX } from "react/jsx-runtime"
-import type { Aid } from "@/types/financialAidTypes"
 
 export type UsageType = "garden" | "toilet" | "washing"
 
@@ -50,28 +49,6 @@ export type SimulatorData = {
   potentialSavings?: number // in m³
   potentialSavingsEuros?: number // in euros
   coverageRate?: number // percentage
-
-  // Metadata about rainfall information
-  /**
-   * Source of the rainfall value (e.g. "OpenMeteo API", "USER_INPUT", etc.)
-   */
-  rainfallDataSource?: string
-
-  /**
-   * Detailed precipitation information returned by the weather service.
-   * Stored so we can display breakdowns without additional network calls.
-   */
-  detailedPrecipitationData?: {
-    monthlyData: number[]
-    totalPrecipitation: number
-    totalRain: number
-    totalSnow: number
-    source: string
-    period: string
-  }
-
-  // Early-fetched financial aids (offline-first)
-  financialAids?: Aid[] // NEW
 }
 
 // Define step structure for clarity

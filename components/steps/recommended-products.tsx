@@ -4,18 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
-import {
-  Printer,
-  MapPin,
-  RefreshCw,
-  ShoppingCart,
-  Check,
-  Droplets,
-  Gauge,
-  Info,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
+import { Printer, MapPin, RefreshCw, ShoppingCart, Check, Droplets, Gauge, Info } from "lucide-react"
 import {
   getRecommendedTanks,
   getAllTanks,
@@ -39,7 +28,9 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   const [recommendedPumps, setRecommendedPumps] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showAllTanks, setShowAllTanks] = useState(false)
+  // Remove the showAllTanks state:
+  // Remove the following lines:
+  // const [showAllTanks, setShowAllTanks] = useState(false)
 
   useEffect(() => {
     async function loadProducts() {
@@ -53,23 +44,18 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
           data.usages || [],
           3, // Limit to 3 tanks
         )
-        // If the JSON file couldn't be fetched, productService returns an empty array.
-        // In that case we silently fall back to local dummy data instead of showing an error.
-        if (tanks.length === 0) {
-          setRecommendedTanks(getTankRecommendations(data.recommendedTankSize || 0))
-          setAllTanks(getTankRecommendations(data.recommendedTankSize || 0)) // use same dummy list for “see more”
-          setRecommendedPumps(getPumpRecommendations(data.usages || []))
-        } else {
-          setRecommendedTanks(tanks)
+        setRecommendedTanks(tanks)
 
-          // Get all tanks for "View More" functionality
-          const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
-          setAllTanks(allTankOptions)
+        // Get all tanks for "View More" functionality
+        // Remove the following line:
+        // const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
+        // Replace it with:
+        const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
+        setAllTanks(allTankOptions)
 
-          // Get compatible pumps based on usage
-          const pumps = await getCompatiblePumps(data.usages || [])
-          setRecommendedPumps(pumps)
-        }
+        // Get compatible pumps based on usage
+        const pumps = await getCompatiblePumps(data.usages || [])
+        setRecommendedPumps(pumps)
       } catch (error) {
         console.error("Error loading product recommendations:", error)
         setError("Impossible de charger les produits recommandés. Veuillez réessayer.")
@@ -86,7 +72,9 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   }, [data.recommendedTankSize, data.usages])
 
   // Determine which tanks to display based on showAllTanks state
-  const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
+  // Remove the conditional rendering based on the showAllTanks state:
+  // Remove the following line:
+  // const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -119,7 +107,9 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
                   Cuves recommandées
                 </h3>
               </div>
-              <Button
+              {/* Remove the "Voir plus" button: */}
+              {/* Remove the following lines: */}
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAllTanks(!showAllTanks)}
@@ -136,10 +126,14 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
                     Voir plus
                   </>
                 )}
-              </Button>
+              </Button> */}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {tanksToDisplay.map((tank) => (
+              {/* Remove the conditional rendering based on the showAllTanks state: */}
+              {/* Remove the following line: */}
+              {/* {tanksToDisplay.map((tank) => ( */}
+              {/* Replace it with: */}
+              {allTanks.map((tank) => (
                 <ProductCard
                   key={tank.id}
                   product={tank}

@@ -199,26 +199,8 @@ export function mapApiAidsToUiAids(apiResponse: FinancialAidApiResponse): Aid[] 
       name: apiAid.libelle,
       organization: apiAid.libelle_programme,
       amount: formatAmount(apiAid.montant_calcule, apiAid.montants),
-      // `groupe_racine` can be either an array or an object – normalise to array
-      conditions: formatConditions(
-        Array.isArray(apiAid.groupe_racine)
-          ? apiAid.groupe_racine
-          : [apiAid.groupe_racine],
-      ),
+      conditions: formatConditions(apiAid.groupe_racine),
       icon: determineIcon(apiAid),
-
-      // ────────────────────────────────────────────────────────────
-      // NEW FIELDS (displayed in the detailed UI card)
-      // ────────────────────────────────────────────────────────────
-      description: apiAid.description,
-      programDescription: apiAid.description_programme ?? undefined,
-      website: apiAid.site ?? undefined,
-      documentationLink: apiAid.lien_documentation ?? undefined,
-      address: apiAid.adresse ?? apiAid.adresse2 ?? undefined,
-      city: apiAid.ville ?? undefined,
-      postalCode: apiAid.code_postal ?? undefined,
-      phone: apiAid.telephone ?? undefined,
-      email: apiAid.mail ?? undefined,
     }
     
     return aid

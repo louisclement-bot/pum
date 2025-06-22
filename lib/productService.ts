@@ -21,42 +21,17 @@ export async function fetchProducts(): Promise<Product[]> {
   if (productsCache) {
     return productsCache
   }
-  /**
-   * We read the body as text first so we can validate that we actually receive
-   * JSON. In production, if the `products.json` file is missing or the route is
-   * mis-configured, Next.js serves an HTML error page which starts with
-   * “<!DOCTYPE…”. Trying to call `response.json()` directly would therefore
-   * throw the “Unexpected token '<'…” error observed.
-   */
+
   try {
-    const response = await fetch("/data/products.json", { cache: "force-cache" })
-
+    const response = await fetch("/data/products.json")
     if (!response.ok) {
-      throw new Error(`Failed to fetch products.json (status ${response.status})`)
+      throw new Error(`Failed to fetch products: ${response.status}`)
     }
-
-    const rawBody = await response.text()
-
-    // If the payload starts with "<" we most likely received HTML instead of JSON
-    const looksLikeHtml = rawBody.trim().startsWith("<")
-    if (looksLikeHtml) {
-      console.error(
-        "products.json endpoint returned HTML instead of JSON.\n" +
-          "This usually means the static file is missing or routing is incorrect.\n" +
-          "First 200 chars of the response:\n" +
-          rawBody.slice(0, 200),
-      )
-      throw new Error("products.json responded with HTML – file may be missing")
-    }
-
-    const products: Product[] = JSON.parse(rawBody)
+    const products: Product[] = await response.json()
     productsCache = products
     return products
   } catch (error) {
-    // Detailed logging to help with debugging in production
-    console.error("Error fetching products.json:", error)
-
-    // Fallback: return empty array (components will switch to dummy data)
+    console.error("Error fetching products:", error)
     return []
   }
 }

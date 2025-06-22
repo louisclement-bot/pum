@@ -25,15 +25,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const [manualInput, setManualInput] = useState<boolean>(false)
   const [manualRainfall, setManualRainfall] = useState<string>("")
   const [dataSource, setDataSource] = useState<string>("none")
-  // Early-fetch of financial aids
-  const [fetchingAids, setFetchingAids] = useState<boolean>(false)
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
   )
-  // New state for location modification
-  const [showLocationInput, setShowLocationInput] = useState<boolean>(false)
-  const [newPostalCode, setNewPostalCode] = useState<string>(postalCode)
-  const [newCity, setNewCity] = useState<string>(data.city || "")
 
   // If we already have address data, fetch rainfall on component mount
   useEffect(() => {
@@ -156,51 +150,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     }
   }
 
-  // ---- LOCATION MODIFICATION HANDLERS ----
-  const handleModifyLocation = () => {
-    // Prefill with current values
-    setNewPostalCode(postalCode)
-    setNewCity(data.city || "")
-    setShowLocationInput(true)
-  }
-
-  const handleCancelLocationModification = () => {
-    setShowLocationInput(false)
-  }
-
-  const handleSaveLocation = () => {
-    if (!newPostalCode.trim()) return
-
-    // Persist changes
-    const cleanedPostal = newPostalCode.trim()
-
-    /* ------------------------------------------------------------------
-     * 1. Clear every value that depended on the previous localisation.
-     * ------------------------------------------------------------------ */
-    setPostalCode(cleanedPostal)
-    setCoordinates(null)             // ⤷ avoid re-using old coords
-    setRainfall(0)                   // ⤷ force UI refresh
-    setDataSource("none")
-
-    // Propagate the reset to the global SimulatorData
-    updateData({
-      postalCode: cleanedPostal,
-      city: newCity.trim(),
-      latitude: undefined,
-      longitude: undefined,
-      annualRainfall: undefined,
-      detailedPrecipitationData: undefined,
-      rainfallDataSource: undefined,
-    })
-
-    /* ------------------------------------------------------------------
-     * 2. Trigger a fresh fetch with the new postal code.
-     * ------------------------------------------------------------------ */
-    fetchRainfall(cleanedPostal)
-
-    setShowLocationInput(false)
-  }
-
   const handleManualInputSubmit = () => {
     const value = Number.parseFloat(manualRainfall)
     if (!isNaN(value) && value > 0) {
@@ -214,9 +163,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   }
 
   const handleNext = async () => {
-    // Avoid double trigger
-    if (fetchingAids) return
-
     // Prepare data update object
     const dataUpdate: Partial<SimulatorData> = {
       annualRainfall: rainfall,
@@ -248,63 +194,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       }
     }
 
-    /* ──────────────────────────────────────────────────────────────
-     * Early fetch of financial aids (offline-first approach)
-     * We use the official proxy route `/api/financial-aid` so that all
-     * auth logic & INSEE resolution are centralized in one place.
-     * ---------------------------------------------------------------- */
-    try {
-      setFetchingAids(true)
-
-      /* ------------------------------------------------------------------
-       * ⟪ FINANCIAL-AIDS LOOKUP STRATEGY ⟫
-       * The Financial-Aid API **requires** that we pass a search value
-       * (postal-code / city-name / etc.) to its `/v4/communes/{searchValue}`
-       * endpoint so it can return *its* authoritative INSEE code before the
-       * actual aids lookup.
-       *
-       * Even if we already own an INSEE code from BAN or elsewhere
-       * (`data.citycode`), we must **not** forward it.  Doing so would skip
-       * the mandatory commune-lookup step and typically yields a 404 such as
-       * “Aucune communes avec code insee '75117'”.
-       *
-       * Therefore, we ALWAYS call the proxy route with a `postcode` query
-       * parameter.  The server-side route will handle the rest of the
-       * protocol (commune-lookup ➜ aids-lookup).
-       * ------------------------------------------------------------------ */
-
-      const effectivePostal = postalCode || data.postalCode
-
-      if (!effectivePostal) {
-        console.warn(
-          "[AID_FETCH] No postal code available – skipping early fetch of financial aids",
-        )
-        dataUpdate.financialAids = []
-      } else {
-        const paramString = `postcode=${effectivePostal}`
-
-        console.log(`[AID_FETCH] calling /api/financial-aid?${paramString}`)
-
-        const res = await fetch(`/api/financial-aid?${paramString}`)
-        if (res.ok) {
-          const json = await res.json()
-          dataUpdate.financialAids = Array.isArray(json.aids) ? json.aids : []
-          console.log(
-            `[AID_FETCH] success – received ${dataUpdate.financialAids.length} aids`,
-          )
-        } else {
-          // Any non-200 is logged but not blocking
-          console.error("[AID_FETCH] error status:", res.status)
-          dataUpdate.financialAids = []
-        }
-      }
-    } catch (e) {
-      console.error("[AID_FETCH] network/error:", e)
-      dataUpdate.financialAids = []
-    } finally {
-      setFetchingAids(false)
-    }
-
     console.log("[DATA SOURCE] Updating SimulatorData with rainfall data source:", dataSource)
     updateData(dataUpdate)
     nextStep()
@@ -328,61 +217,14 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           </div>
         </div>
 
-        {showLocationInput ? (
-          /* ---------- LOCATION EDIT FORM ---------- */
-          <div className="space-y-4 max-w-md mx-auto mb-8">
-            <div className="space-y-2">
-              <Label htmlFor="new-postal-code" className="text-[#1D40AF] dark:text-blue-300 font-medium">
-                Code postal
-              </Label>
-              <Input
-                id="new-postal-code"
-                value={newPostalCode}
-                onChange={(e) => setNewPostalCode(e.target.value)}
-                placeholder="75017"
-                className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl"
-              />
+        {data.city ? (
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center mb-8">
+            <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
+              <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="new-city" className="text-[#1D40AF] dark:text-blue-300 font-medium">
-                Ville (optionnel)
-              </Label>
-              <Input
-                id="new-city"
-                value={newCity}
-                onChange={(e) => setNewCity(e.target.value)}
-                placeholder="Paris"
-                className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl"
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button variant="ghost" onClick={handleCancelLocationModification}>
-                Annuler
-              </Button>
-              <Button onClick={handleSaveLocation} disabled={isLoading || !newPostalCode.trim()}>
-                Enregistrer
-              </Button>
-            </div>
-          </div>
-        ) : data.city ? (
-          /* ---------- LOCATION DISPLAY WITH MODIFY BUTTON ---------- */
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center justify-between mb-8">
-            <div className="flex items-center">
-              <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
-                <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
-              </div>
-              <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
-                Basé sur votre adresse à <span className="font-bold">{data.city}</span>
-              </p>
-            </div>
-            <Button
-              onClick={handleModifyLocation}
-              variant="link"
-              className="text-blue-600 dark:text-blue-400"
-            >
-              <Edit3 className="h-4 w-4 mr-2" />
-              Modifier l&apos;emplacement
-            </Button>
+            <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
+              Basé sur votre adresse à <span className="font-bold">{data.city}</span>
+            </p>
           </div>
         ) : (
           <div className="space-y-4 max-w-md mx-auto mb-8">
@@ -520,16 +362,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       <StepButtons
         onNext={handleNext}
         onPrev={prevStep}
-        nextDisabled={!rainfall || rainfall <= 0 || fetchingAids}
+        nextDisabled={!rainfall || rainfall <= 0}
         nextLabel="Continuer"
       />
-
-      {/* Discrete loader while fetching financial aids */}
-      {fetchingAids && (
-        <div className="flex justify-center mt-4">
-          <Loader2 className="h-6 w-6 animate-spin text-[#1D40AF] dark:text-blue-400" />
-        </div>
-      )}
     </div>
   )
 }

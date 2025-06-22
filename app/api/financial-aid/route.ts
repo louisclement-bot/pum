@@ -16,16 +16,12 @@ export async function GET(req: Request) {
   // Extract query parameters
   const { searchParams } = new URL(req.url)
   const postcode = searchParams.get("postcode")
-  const codeInseeParam = searchParams.get("codeInsee")
   
-  // We need *some* search value (postal-code, city name, or even an un-verified
-  // INSEE) to feed the Financial-Aid API’s `/communes/{searchValue}` endpoint.
-  const searchValue = postcode || codeInseeParam
-
-  if (!searchValue) {
-    console.error("[API] Financial aid route called without any searchable value")
+  // Validate parameters
+  if (!postcode) {
+    console.error("[API] Financial aid route called without required postcode")
     return NextResponse.json(
-      { error: "Le code postal ou le code INSEE est requis" },
+      { error: "Le code postal est requis" },
       { status: 400 }
     )
   }
@@ -34,24 +30,19 @@ export async function GET(req: Request) {
     // ------------------------------------------------------------------
     // 1. Resolve INSEE code systematically via Financial-Aid API lookup
     // ------------------------------------------------------------------
+    console.log(`[API] Looking up INSEE code for postal code: ${postcode}`)
     let insee: string
-
-    // ALWAYS go through the Financial-Aid API commune lookup – even if the
-    // incoming value *looks* like an INSEE code, we still treat it as a
-    // search string for `/communes/{searchValue}` so we receive their
-    // authoritative code.
-    console.log(`[API] Resolving INSEE code via commune lookup for search value: ${searchValue}`)
     try {
-      insee = await getInseeByPostcode(searchValue)
-      console.log(`[API] Commune lookup returned INSEE: ${insee} for search value: ${searchValue}`)
+      insee = await getInseeByPostcode(postcode)
+      console.log(`[API] Resolved INSEE code ${insee} for postal code ${postcode}`)
     } catch (error) {
-      console.error(`[API] Error during commune lookup for search value ${searchValue}:`, error)
+      console.error(`[API] Error getting INSEE code for postal code ${postcode}:`, error)
         
       // Handle specific errors from commune lookup
       if (error instanceof Error) {
         if (error.message.includes("Aucune commune trouvée")) {
           return NextResponse.json(
-            { error: `Aucune commune trouvée pour la valeur « ${searchValue} »` },
+            { error: `Aucune commune trouvée pour le code postal ${postcode}` },
             { status: 404 }
           )
         } else if (error.message.includes("authentification")) {
@@ -67,9 +58,7 @@ export async function GET(req: Request) {
         { status: 500 }
       )
     }
-    // ------------------------------------------------------------------
-    // 2. Fetch financial aids with the resolved INSEE code
-    // ------------------------------------------------------------------
+    
     // Get financial aids with the INSEE code
     try {
       console.log(`[API] Fetching financial aids for INSEE code: ${insee}`)

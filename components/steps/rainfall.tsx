@@ -264,39 +264,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           </div>
         )}
 
-        <div className="mt-6 text-center">
-          {!manualInput ? (
-            <Button
-              variant="link"
-              onClick={() => {
-                setManualInput(true)
-                if (rainfall > 0 && dataSource !== "USER_INPUT") {
-                  // Pre-fill if value exists and is not already manual
-                  setManualRainfall(rainfall.toString())
-                } else {
-                  setManualRainfall("") // Clear if no valid pre-fill
-                }
-                setError(null)
-              }}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-            >
-              Saisir manuellement la pluviométrie
-            </Button>
-          ) : (
-            <Button
-              variant="link"
-              onClick={() => {
-                setManualInput(false)
-                setError(null)
-                // useEffect should handle re-fetching if postalCode or data.city is available
-              }}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-            >
-              {data.city || postalCode ? "Utiliser la recherche automatique" : "Rechercher par code postal"}
-            </Button>
-          )}
-        </div>
-
         {error && (
           <div className="bg-amber-50 dark:bg-amber-900/20 p-4 md:p-6 rounded-xl border border-amber-200 dark:border-amber-800 flex items-start mb-8">
             <div className="bg-amber-100 dark:bg-amber-800/50 p-2 rounded-full mr-3 shrink-0">
@@ -314,37 +281,52 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
         )}
 
         {manualInput && (
-          <div className="space-y-4 max-w-md mx-auto mb-8">
-            <div className="space-y-2">
-              <Label htmlFor="manual-rainfall" className="text-[#1D40AF] dark:text-blue-300 font-medium">
-                Pluviométrie moyenne annuelle (mm/an)
-              </Label>
-              <div className="flex gap-3">
-                <div className="relative flex-1">
-                  <Input
-                    id="manual-rainfall"
-                    value={manualRainfall}
-                    onChange={(e) => setManualRainfall(e.target.value)}
-                    placeholder="800"
-                    type="number"
-                    min="0"
-                    className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl pr-10"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleManualInputSubmit()
-                      }
-                    }}
-                  />
+          <>
+            <div className="text-center mb-4">
+              <Button
+                variant="link"
+                onClick={() => {
+                  setManualInput(false)
+                  setError(null)
+                  // If postalCode or data.city exists, useEffect will trigger refetch
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                {data.city || postalCode ? "Utiliser la recherche automatique" : "Rechercher par code postal"}
+              </Button>
+            </div>
+            <div className="space-y-4 max-w-md mx-auto mb-8">
+              <div className="space-y-2">
+                <Label htmlFor="manual-rainfall" className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                  Pluviométrie moyenne annuelle (mm/an)
+                </Label>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Input
+                      id="manual-rainfall"
+                      value={manualRainfall}
+                      onChange={(e) => setManualRainfall(e.target.value)}
+                      placeholder="800"
+                      type="number"
+                      min="0"
+                      className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl pr-10"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleManualInputSubmit()
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleManualInputSubmit}
+                    className="h-12 px-5 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <Edit3 className="h-5 w-5" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleManualInputSubmit}
-                  className="h-12 px-5 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  <Edit3 className="h-5 w-5" />
-                </Button>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {!manualInput && (
@@ -368,6 +350,22 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
                     Données météo réelles (Open-Meteo)
                   </div>
                 )}
+                <Button
+                  onClick={() => {
+                    setManualInput(true)
+                    if (rainfall > 0 && dataSource !== "USER_INPUT") {
+                      setManualRainfall(rainfall.toString())
+                    } else {
+                      setManualRainfall("")
+                    }
+                    setError(null)
+                  }}
+                  variant="link"
+                  className="mt-4 text-blue-600 dark:text-blue-400"
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Modifier manuellement
+                </Button>
               </>
             ) : (
               <div className="py-8">

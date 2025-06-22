@@ -27,25 +27,21 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
       setError(null)
       setAids([])
 
-      // Prefer INSEE code if available (may be attached by AddressSearch)
-      const codeInsee = data.citycode
       const postcode = data.postalCode
 
-      if (!codeInsee && !postcode) {
+      // AidesFi API needs the *postal code* so it can resolve the authoritative
+      // INSEE code internally. If we don't have it, we cannot continue.
+      if (!postcode) {
         setError("Code postal manquant – impossible de rechercher les aides financières.")
         setIsLoading(false)
         return
       }
 
       const params = new URLSearchParams()
-      if (codeInsee) {
-        params.append("codeInsee", codeInsee)
-      } else if (postcode) {
-        params.append("postcode", postcode)
-      }
+      params.append("postcode", postcode)
 
       try {
-        console.debug("[FinancialAid] Fetching aids with params:", params.toString())
+        console.debug("[FinancialAid] Fetching aids with postalCode:", postcode)
         const res = await fetch(`/api/financial-aid?${params.toString()}`)
         const json = await res.json()
 
@@ -69,7 +65,7 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
 
     fetchAids()
     // Depend on postalCode / citycode changes
-  }, [data.postalCode, data.citycode])
+  }, [data.postalCode])
 
   return (
     <div className="space-y-8">

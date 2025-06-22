@@ -24,7 +24,7 @@ Le flux cible :
 | INSEE déjà dispo | Réponse back-end `/api/roof-surface` : `geocoded_address.citycode`. Cette valeur est stockée dans `AddressSearchContext.state.apiResponse`. Accessible dans le front. |
 
 Data structures :
-```ts
+\`\`\`ts
 // actuelle (mock)
 type Aid = {
   id: string
@@ -34,9 +34,9 @@ type Aid = {
   conditions: string
   icon: React.ReactNode
 }
-```
+\`\`\`
 Réponse API cible (abrégé) :
-```json
+\`\`\`json
 {
   "aides": [{
     "id": 1,
@@ -49,16 +49,16 @@ Réponse API cible (abrégé) :
     ...
   }]
 }
-```
+\`\`\`
 
 ---
 
 ## 3. API Integration Specifications
 
 ### 3.1 Authentification
-```
+\`\`\`
 Header:  X-AUTH-TOKEN: ZEc5clpXNWZjSEp2WkY5d2RXMWZZbUZqYTJWdVpFRlFTUT09
-```
+\`\`\`
 
 ### 3.2 Endpoints
 
@@ -70,9 +70,9 @@ Header:  X-AUTH-TOKEN: ZEc5clpXNWZjSEp2WkY5d2RXMWZZbUZqYTJWdVpFRlFTUT09
 ### 3.3 Schémas (essentiels)
 
 `/v4/communes/75001` →  
-```json
+\`\`\`json
 [ { "nom": "Paris", "code_postal": "75001", "code_insee": "75056" } ]
-```
+\`\`\`
 
 `/v4/redp/75056` → voir exemple complet dans doc technique.
 
@@ -110,9 +110,9 @@ Header:  X-AUTH-TOKEN: ZEc5clpXNWZjSEp2WkY5d2RXMWZZbUZqYTJWdVpFRlFTUT09
 | (icône) | `icon` | utiliser `Euro`, `Building`, etc. selon `libelle_programme`. |
 
 Lookup flow :
-```
+\`\`\`
 postalCode -> /v4/communes/ -> code_insee -> /v4/redp/ -> map -> UI
-```
+\`\`\`
 Si `citycode` déjà dispo via roof-surface : sauter la 1ʳᵉ requête.
 
 ---
@@ -136,7 +136,7 @@ Si `citycode` déjà dispo via roof-surface : sauter la 1ʳᵉ requête.
 ## 7. Code Examples
 
 ### 7.1 Service (`lib/financialAidService.ts`)
-```ts
+\`\`\`ts
 const BASE_URL = "https://apiaidesfi.pia-production.fr/v4";
 const HEADERS = {
   "X-AUTH-TOKEN": process.env.AIDESFI_TOKEN!,
@@ -156,10 +156,10 @@ export async function getFinancialAids(codeInsee: string) {
   if (!res.ok) throw new Error(`Aides lookup failed (${res.status})`);
   return (await res.json()) as FinancialAidApiResponse;
 }
-```
+\`\`\`
 
 ### 7.2 Types (`types/financialAidTypes.ts`)
-```ts
+\`\`\`ts
 export interface FinancialAidApiResponse {
   nb_aides: number;
   aides: ApiAid[];
@@ -179,10 +179,10 @@ export interface AidUI {
   amount: string;
   conditions: string;
 }
-```
+\`\`\`
 
 ### 7.3 Component patch (extrait)
-```tsx
+\`\`\`tsx
 import { getFinancialAids, getInseeByPostcode } from "@/lib/financialAidService";
 ...
 useEffect(() => {
@@ -213,11 +213,11 @@ useEffect(() => {
   };
   if (data.postalCode) load();
 }, [data.postalCode, data.citycode]);
-```
+\`\`\`
 
 ### 7.4 Proxy route (optional, hides token)
 `app/api/financial-aid/route.ts`
-```ts
+\`\`\`ts
 import { NextResponse } from "next/server";
 import { getFinancialAids, getInseeByPostcode } from "@/lib/financialAidService";
 
@@ -234,7 +234,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-```
+\`\`\`
 
 ---
 

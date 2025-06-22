@@ -7,7 +7,7 @@
 
 Optimiser le flux « aides financières » :
 
-```
+\`\`\`
 Pluviométrie (Rainfall) ──► Early fetch API
                    │
                    └─── stocker dans SimulatorData.financialAids
@@ -15,7 +15,7 @@ Pluviométrie (Rainfall) ──► Early fetch API
 Résultats (Results) ──► bouton conditionnel « Voir les X aides »
                               │
 Aides (FinancialAid) ──► affichage offline-first (aucun appel API)
-```
+\`\`\`
 
 Gains :  
 * une seule requête réseau → UX plus fluide  
@@ -38,9 +38,9 @@ Gains :
 
 ### 3.1 Endpoint
 
-```
+\`\`\`
 GET https://apiaidesfi.pia-production.fr/v4/redp/{code_insee}
-```
+\`\`\`
 
 | Élément        | Valeur                                                               |
 |----------------|---------------------------------------------------------------------|
@@ -49,14 +49,14 @@ GET https://apiaidesfi.pia-production.fr/v4/redp/{code_insee}
 
 Exemple Curl :
 
-```bash
+\`\`\`bash
 curl -H "X-AUTH-TOKEN: $NEXT_PUBLIC_AIDESFI_TOKEN" \
      https://apiaidesfi.pia-production.fr/v4/redp/75056
-```
+\`\`\`
 
 ### 3.2 Réponse `200` – Exemple réel (2 aides trouvées)
 
-```json
+\`\`\`json
 {
   "nb_aides": 2,
   "liste_id_aides": [7920, 7921],
@@ -107,11 +107,11 @@ curl -H "X-AUTH-TOKEN: $NEXT_PUBLIC_AIDESFI_TOKEN" \
     { "... second aid object …" }
   ]
 }
-```
+\`\`\`
 
 ### 3.3 Réponse `200` – Exemple « schema » (0 aide, `groupe_racine` **tableau**)
 
-```json
+\`\`\`json
 {
   "nb_aides": 0,
   "liste_id_aides": [0],
@@ -144,7 +144,7 @@ curl -H "X-AUTH-TOKEN: $NEXT_PUBLIC_AIDESFI_TOKEN" \
     }
   ]
 }
-```
+\`\`\`
 
 ### 3.4 Codes d’état
 
@@ -164,21 +164,21 @@ curl -H "X-AUTH-TOKEN: $NEXT_PUBLIC_AIDESFI_TOKEN" \
 L’API retourne **deux** formats :
 
 * **Objet** (majorité des communes)  
-  ```json
+  \`\`\`json
   "groupe_racine": {
     "conditions": [...]
   }
-  ```
+  \`\`\`
 * **Tableau** (schema de la doc)  
-  ```json
+  \`\`\`json
   "groupe_racine": [ { "conditions": [...] } ]
-  ```
+  \`\`\`
 
 Le mapping actuel suppose obligatoirement un tableau → `flatMap` lève une exception sur un objet.
 
 ### 3.2 Fix
 
-```ts
+\`\`\`ts
 // lib/financialAidService.ts
 function extractConditions(groupe: any): string[] {
   if (!groupe) return [];
@@ -194,7 +194,7 @@ export function formatConditions(groupeRacine: any): string {
   const labels = extractConditions(groupeRacine);
   return labels.length ? labels.join("; ") : "Conditions non spécifiées";
 }
-```
+\`\`\`
 
 *Ajoutez un test unitaire couvrant objet + tableau.*
 
@@ -202,13 +202,13 @@ export function formatConditions(groupeRacine: any): string {
 
 ## 5. Extension de `SimulatorData`
 
-```ts
+\`\`\`ts
 // components/rainwater-simulator.tsx
 export type SimulatorData = {
   /* …champs existants… */
   financialAids?: Aid[]        // NEW
 }
-```
+\`\`\`
 
 ---
 
@@ -216,7 +216,7 @@ export type SimulatorData = {
 
 ### 5.1 Service helper
 
-```ts
+\`\`\`ts
 // lib/useFinancialAid.ts
 export async function fetchFinancialAid(postal?: string, insee?: string): Promise<Aid[]> {
   const params = insee ? `codeInsee=${insee}` : `postcode=${postal}`;
@@ -224,11 +224,11 @@ export async function fetchFinancialAid(postal?: string, insee?: string): Promis
   if (!res.ok) throw new Error(await res.text());
   return (await res.json()).aids as Aid[];
 }
-```
+\`\`\`
 
 ### 5.2 Intégration dans le composant
 
-```tsx
+\`\`\`tsx
 // components/steps/rainfall.tsx  (extrait)
 const [fetchingAids, setFetchingAids] = useState(false);
 
@@ -246,7 +246,7 @@ const handleNext = async () => {
     nextStep();
   }
 }
-```
+\`\`\`
 
 UI : afficher un loader discret tant que `fetchingAids` est `true`.
 
@@ -254,7 +254,7 @@ UI : afficher un loader discret tant que `fetchingAids` est `true`.
 
 ## 7. Étape 2 : Bouton conditionnel dans **Results**
 
-```tsx
+\`\`\`tsx
 // components/steps/results.tsx  (extrait)
 const aidsCount = data.financialAids?.length ?? 0;
 
@@ -264,7 +264,7 @@ const aidsCount = data.financialAids?.length ?? 0;
     <ChevronRight className="ml-2 h-4 w-4" />
   </Button>
 )}
-```
+\`\`\`
 
 *Astuce* : gardez l’ancien test `!!data.postalCode` en *fallback* pour ne pas casser l’UX en cas d’erreur serveur.
 
@@ -275,7 +275,7 @@ const aidsCount = data.financialAids?.length ?? 0;
 * Supprimez tout `useEffect` de fetch.  
 * Consommez simplement `props.data.financialAids`.
 
-```tsx
+\`\`\`tsx
 if (!data.financialAids || data.financialAids.length === 0) {
   return <EmptyState />; // message « Aucune aide »
 }
@@ -283,7 +283,7 @@ if (!data.financialAids || data.financialAids.length === 0) {
 return (
   <div>{data.financialAids.map(renderAidCard)}</div>
 );
-```
+\`\`\`
 
 ---
 
@@ -312,12 +312,12 @@ return (
 
 *Mock : objet vs tableau*
 
-```ts
+\`\`\`ts
 it("extracts conditions from object & array", () => {
   expect(formatConditions(sampleObject)).toBe("Cuve aérienne; Installation …");
   expect(formatConditions([sampleObject])).toBe("Cuve aérienne; Installation …");
 });
-```
+\`\`\`
 
 ### 10.2 Integration ‑ Rainfall
 
@@ -342,7 +342,7 @@ it("extracts conditions from object & array", () => {
 
 ## 13. Interfaces TypeScript recommandées
 
-```ts
+\`\`\`ts
 export interface RedpResponse {
   nb_aides: number;
   liste_id_aides: number[];
@@ -383,7 +383,7 @@ export interface ApiGroup {
   conditions?: { libelle: string }[];
   groupes_fils?: ApiGroup[];
 }
-```
+\`\`\`
 
 ---
 

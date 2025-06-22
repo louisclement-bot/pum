@@ -26,7 +26,7 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [dataSource, setDataSource] = useState<string>("unknown")
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
 
   // Function to fetch rainfall data with retry logic
   const fetchRainfallData = useCallback(async () => {
@@ -158,13 +158,71 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
             ) : (
               <>
                 <ChevronDown className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Voir les graphiques détaillés</span>
+                <span className="hidden sm:inline">Voir les détails</span>
                 <span className="sm:hidden">Voir plus</span>
               </>
             )}
           </Button>
         </div>
 
+        {/* Stat cards - always visible */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <StatCard
+            icon={<Droplets className="h-5 w-5 text-blue-500" />}
+            title="Précipitations totales"
+            value={`${formatNumber(rainfallData.totalPrecipitation, 1)} mm`}
+          />
+          <StatCard
+            icon={<CloudRain className="h-5 w-5 text-blue-500" />}
+            title="Mois le plus pluvieux"
+            value={`${wettestMonth.month} (${formatNumber(wettestMonth.precipitation, 1)} mm)`}
+          />
+          <StatCard
+            icon={<Snowflake className="h-5 w-5 text-blue-500" />}
+            title="Mois le plus sec"
+            value={`${driestMonth.month} (${formatNumber(driestMonth.precipitation, 1)} mm)`}
+          />
+        </div>
+
+        {/* Tabs - always visible */}
+        <Tabs defaultValue="monthly" className="w-full">
+          <TabsList className="w-full justify-start mb-4 bg-slate-100 dark:bg-slate-800 overflow-x-auto">
+            <TabsTrigger value="monthly" className="flex items-center gap-2">
+              <BarChart2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Précipitations</span> mensuelles
+            </TabsTrigger>
+            <TabsTrigger value="cumulative" className="flex items-center gap-2">
+              <Droplets className="h-4 w-4" />
+              <span className="hidden sm:inline">Précipitations</span> cumulées
+            </TabsTrigger>
+            <TabsTrigger value="composition" className="flex items-center gap-2">
+              <CloudRain className="h-4 w-4" />
+              Composition
+            </TabsTrigger>
+            <TabsTrigger value="table" className="flex items-center gap-2">
+              <TableIcon className="h-4 w-4" />
+              Tableau
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="monthly" className="mt-4">
+            <MonthlyRainfallChart data={rainfallData.monthlyData} />
+          </TabsContent>
+
+          <TabsContent value="cumulative" className="mt-4">
+            <CumulativeRainfallChart data={rainfallData.monthlyData} />
+          </TabsContent>
+
+          <TabsContent value="composition" className="mt-4">
+            <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
+          </TabsContent>
+
+          <TabsContent value="table" className="mt-4">
+            <RainfallDataTable data={rainfallData.monthlyData} />
+          </TabsContent>
+        </Tabs>
+
+        {/* Source information - collapsible */}
         <motion.div
           initial={false}
           animate={{
@@ -176,90 +234,15 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
             height: { duration: 0.3, ease: "easeInOut" },
             opacity: { duration: 0.2, ease: "easeInOut" },
           }}
-          className="overflow-hidden"
+          className="overflow-hidden mt-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <StatCard
-              icon={<Droplets className="h-5 w-5 text-blue-500" />}
-              title="Précipitations totales"
-              value={`${formatNumber(rainfallData.totalPrecipitation, 1)} mm`}
-            />
-            <StatCard
-              icon={<CloudRain className="h-5 w-5 text-blue-500" />}
-              title="Mois le plus pluvieux"
-              value={`${wettestMonth.month} (${formatNumber(wettestMonth.precipitation, 1)} mm)`}
-            />
-            <StatCard
-              icon={<Snowflake className="h-5 w-5 text-blue-500" />}
-              title="Mois le plus sec"
-              value={`${driestMonth.month} (${formatNumber(driestMonth.precipitation, 1)} mm)`}
-            />
-          </div>
-
-          {/* Show tabs only when expanded */}
-          {isExpanded && (
-            <Tabs defaultValue="monthly" className="w-full">
-              <TabsList className="w-full justify-start mb-4 bg-slate-100 dark:bg-slate-800 overflow-x-auto">
-                <TabsTrigger value="monthly" className="flex items-center gap-2">
-                  <BarChart2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Précipitations</span> mensuelles
-                </TabsTrigger>
-                <TabsTrigger value="cumulative" className="flex items-center gap-2">
-                  <Droplets className="h-4 w-4" />
-                  <span className="hidden sm:inline">Précipitations</span> cumulées
-                </TabsTrigger>
-                <TabsTrigger value="composition" className="flex items-center gap-2">
-                  <CloudRain className="h-4 w-4" />
-                  Composition
-                </TabsTrigger>
-                <TabsTrigger value="table" className="flex items-center gap-2">
-                  <TableIcon className="h-4 w-4" />
-                  Tableau
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="monthly" className="mt-4">
-                <MonthlyRainfallChart data={rainfallData.monthlyData} />
-              </TabsContent>
-
-              <TabsContent value="cumulative" className="mt-4">
-                <CumulativeRainfallChart data={rainfallData.monthlyData} />
-              </TabsContent>
-
-              <TabsContent value="composition" className="mt-4">
-                <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
-              </TabsContent>
-
-              <TabsContent value="table" className="mt-4">
-                <RainfallDataTable data={rainfallData.monthlyData} />
-              </TabsContent>
-            </Tabs>
-          )}
-
-          <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 italic">
+          <div className="text-xs text-slate-500 dark:text-slate-400 italic">
             Source:{" "}
             {dataSource === "USER_INPUT"
               ? "Données saisies manuellement."
               : "Open-Meteo API. Les données sont basées sur des prévisions et peuvent varier."}
           </div>
         </motion.div>
-
-        {!isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="bg-blue-50/50 dark:bg-blue-900/10 rounded-lg p-4 mt-2 text-center"
-          >
-            <p className="text-sm text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <CloudRain className="h-4 w-4 mr-2" />
-              Cliquez sur "Voir plus" pour afficher les graphiques détaillés des précipitations
-            </p>
-            <p className="text-xs text-blue-500/70 dark:text-blue-400/70 mt-1">
-              {formatNumber(rainfallData.totalPrecipitation, 1)} mm de précipitations annuelles
-            </p>
-          </motion.div>
-        )}
       </CardContent>
     </Card>
   )

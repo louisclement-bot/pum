@@ -256,19 +256,47 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     try {
       setFetchingAids(true)
 
-      const paramString = data.citycode
-        ? `codeInsee=${data.citycode}`
-        : `postcode=${postalCode || data.postalCode}`
+      /* ------------------------------------------------------------------
+       * ⟪ FINANCIAL-AIDS LOOKUP STRATEGY ⟫
+       * The Financial-Aid API **requires** that we pass a search value
+       * (postal-code / city-name / etc.) to its `/v4/communes/{searchValue}`
+       * endpoint so it can return *its* authoritative INSEE code before the
+       * actual aids lookup.
+       *
+       * Even if we already own an INSEE code from BAN or elsewhere
+       * (`data.citycode`), we must **not** forward it.  Doing so would skip
+       * the mandatory commune-lookup step and typically yields a 404 such as
+       * “Aucune communes avec code insee '75117'”.
+       *
+       * Therefore, we ALWAYS call the proxy route with a `postcode` query
+       * parameter.  The server-side route will handle the rest of the
+       * protocol (commune-lookup ➜ aids-lookup).
+       * ------------------------------------------------------------------ */
 
-      const res = await fetch(`/api/financial-aid?${paramString}`)
-      if (res.ok) {
-        const json = await res.json()
-        dataUpdate.financialAids = Array.isArray(json.aids) ? json.aids : []
-        console.log(`[AID_FETCH] success – received ${dataUpdate.financialAids.length} aids`)
-      } else {
-        // Any non-200 is logged but not blocking
-        console.error("[AID_FETCH] error status:", res.status)
+      const effectivePostal = postalCode || data.postalCode
+
+      if (!effectivePostal) {
+        console.warn(
+          "[AID_FETCH] No postal code available – skipping early fetch of financial aids",
+        )
         dataUpdate.financialAids = []
+      } else {
+        const paramString = `postcode=${effectivePostal}`
+
+        console.log(`[AID_FETCH] calling /api/financial-aid?${paramString}`)
+
+        const res = await fetch(`/api/financial-aid?${paramString}`)
+        if (res.ok) {
+          const json = await res.json()
+          dataUpdate.financialAids = Array.isArray(json.aids) ? json.aids : []
+          console.log(
+            `[AID_FETCH] success – received ${dataUpdate.financialAids.length} aids`,
+          )
+        } else {
+          // Any non-200 is logged but not blocking
+          console.error("[AID_FETCH] error status:", res.status)
+          dataUpdate.financialAids = []
+        }
       }
     } catch (e) {
       console.error("[AID_FETCH] network/error:", e)

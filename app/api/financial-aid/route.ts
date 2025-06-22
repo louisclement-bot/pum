@@ -67,8 +67,9 @@ export async function GET(req: Request) {
         { status: 500 }
       )
     }
-    }
-    
+    // ------------------------------------------------------------------
+    // 2. Fetch financial aids with the resolved INSEE code
+    // ------------------------------------------------------------------
     // Get financial aids with the INSEE code
     try {
       console.log(`[API] Fetching financial aids for INSEE code: ${insee}`)

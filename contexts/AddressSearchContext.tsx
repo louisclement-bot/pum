@@ -277,6 +277,7 @@ export function AddressSearchProvider({
       roofSurface: selectedBuilding.roof_surface_m2 || 0,
       postalCode: geocodedAddress.postcode || processingAddressRef.current?.postcode || "",
       city: geocodedAddress.city || processingAddressRef.current?.city || state.address.split(",").pop()?.trim(),
+      citycode: geocodedAddress.citycode || processingAddressRef.current?.citycode,
       annualRainfall: state.apiResponse?.average_annual_pluviometry_mm_per_year || null,
       latitude: latitude,
       longitude: longitude,

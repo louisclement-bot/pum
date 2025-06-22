@@ -84,3 +84,21 @@ Root cause
 ### Maintainer Notes
 * Keep **`FINANCIAL_AID_API_INTEGRATION_GUIDE.md`** up to date with this mandatory 2-step protocol.
 * If the Financial-Aid provider adds new auth or changes route signatures, update `lib/financialAidService.ts` first and **never bypass** `/v4/communes/{searchValue}`.  
+
+---
+
+## 7. Deployment Fix
+
+During the first deployment with this branch the build failed because of
+syntax errors introduced while refactoring the API route:
+
+* Duplicate `console.log` line where the real `apiResponse` assignment was
+  expected.
+* An extra closing brace that broke the `try … catch` structure.
+
+These issues were corrected in commit `691d18a`.
+
+| Build | Result |
+|-------|--------|
+| **Status** | ✅ Passing |
+| **Deployment** | Ready for production |

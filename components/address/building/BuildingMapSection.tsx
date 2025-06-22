@@ -16,7 +16,7 @@ export default function BuildingMapSection() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-blue-800 dark:text-blue-300">Sélectionnez votre bâtiment</h3>
+      <h3 className="text-lg font-medium text-blue-800 dark:text-blue-300">Votre bâtiment</h3>
 
       {mapError ? (
         <Alert variant="destructive" className="mb-4">

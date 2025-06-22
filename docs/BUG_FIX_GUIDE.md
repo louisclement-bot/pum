@@ -20,7 +20,7 @@ Les tâches sont priorisées ; chaque action cite : fichier, lignes approximativ
 
 Ajouter un helper réutilisable :
 
-```ts
+\`\`\`ts
 // lib/useSingleFlight.ts
 import { useRef, useCallback } from "react"
 
@@ -35,13 +35,13 @@ export function useSingleFlight<T extends any[]>(
   }, [fn])
   return [wrapped, () => busy.current]
 }
-```
+\`\`\`
 
 ### 1.2  Patch `StepButtons`
 
 `components/ui-elements/step-buttons.tsx`
 
-```tsx
+\`\`\`tsx
 type StepButtonsProps = {
   onNext?: () => void
   onPrev?: () => void
@@ -56,7 +56,7 @@ type StepButtonsProps = {
 >
   {busy ? "…" : nextLabel}
 </Button>
-```
+\`\`\`
 
 ### 1.3  Implémentations par écran
 
@@ -102,26 +102,26 @@ Durant la mise en place de la défense anti-double-clic, un problème subtil a �
 
 2. **Analyse – cause racine**  
    *Dans `components/steps/usage-selection.tsx`* :  
-   ```tsx
+   \`\`\`tsx
    function UsageCard({ … }) {
      const selectedUsages = []   // ← VARIABLE LOCALE FANTÔME
-   ```
+   \`\`\`
    Cette variable masque (shadow) l'état remonté par le composant parent : `selectedUsages` reste donc **toujours vide** à l'intérieur du composant, les logs console sont trompeurs et la logique `handleNext` pense qu'aucun usage n'est sélectionné.
 
    De plus, même après correction de cette variable, un second problème existe : les mises à jour d'état React sont asynchrones, donc `data.usages` n'est pas immédiatement disponible lors de l'appel à `goToStep(1, 2)`.
 
 3. **Lignes problématiques**  
-   ```tsx
+   \`\`\`tsx
    // components/steps/usage-selection.tsx  (fin de fichier)
    132: function UsageCard({ id, … }) {
    133:   const selectedUsages = []   // <= à supprimer
-   ```
+   \`\`\`
    
-   ```tsx
+   \`\`\`tsx
    // components/steps/usage-selection.tsx (dans handleNext)
    58: if (selectedUsages.includes("garden")) {
    59:   goToStep(1, 2) // <= navigation avant mise à jour d'état
-   ```
+   \`\`\`
 
 4. **Étapes exactes du dysfonctionnement**  
    1. L'utilisateur clique sur la carte « Jardin » → `handleUsageToggle("garden")` met à jour l'état parent.  
@@ -132,25 +132,25 @@ Durant la mise en place de la défense anti-double-clic, un problème subtil a �
 5. **Pistes de résolution**  
    *Approche A – Minimaliste (implémentée)*  
    • Supprimer la variable fantôme et déclencher la navigation *après* la mise à jour d'état :
-   ```diff
+   \`\`\`diff
      function UsageCard({ … }: UsageCardProps) {
    -   const selectedUsages = [] // Declare the variable here
        return (
-   ```
-   ```diff
+   \`\`\`
+   \`\`\`diff
      // Dans handleNext
      updateData(updatedData)
      if (selectedUsages.includes("garden")) {
    -   goToStep(1, 2)
    +   setTimeout(() => goToStep(1, 2), 0) // Exécution après commit de l'état
      }
-   ```  
+   \`\`\`  
    
    *Approche B – useEffect pattern*  
    • Utiliser un effet pour détecter les changements de `data.usages` et naviguer automatiquement.
 
 6. **Correctif appliqué**  
-   ```patch
+   \`\`\`patch
    *** Update File: components/steps/usage-selection.tsx
    @@
    -function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCardProps) {
@@ -158,15 +158,15 @@ Durant la mise en place de la défense anti-double-clic, un problème subtil a �
    -  {console.log("Current selected usages:", selectedUsages)}
    +function UsageCard({ id, title, description, icon, checked, onToggle }: UsageCardProps) {
    +  // Utiliser uniquement la prop `checked` pour savoir si la carte est sélectionnée
-   ```  
-   ```patch
+   \`\`\`  
+   \`\`\`patch
    @@
    if (selectedUsages.includes("garden")) {
    -  goToStep(1, 2) // Explicitly go to step 1, substep 2 (Garden Surface)
    +  // Delay navigation to ensure `updateData` state is committed
    +  setTimeout(() => goToStep(1, 2), 0)
    }
-   ```
+   \`\`\`
 
    **Statut** : ✅ **RÉSOLU** - Le bouton Suivant fonctionne maintenant correctement lorsque seul "Arrosage du jardin" est sélectionné.
 
@@ -182,10 +182,10 @@ Durant la mise en place de la défense anti-double-clic, un problème subtil a �
 
 `components/steps/autonomy-selection.tsx` `L100-115`
 
-```ts
+\`\`\`ts
 const recommendedTankSizeM3Rounded = Math.ceil(recommendedTankSizeM3)
 const recommendedTankSize = recommendedTankSizeM3Rounded * 1000   // litres
-```
+\`\`\`
 
 ### 4.2  Économie : pas de centimes + note
 
@@ -194,18 +194,18 @@ const recommendedTankSize = recommendedTankSizeM3Rounded * 1000   // litres
 * Formattage euros : `formatNumber(data.potentialSavingsEuros,0)`
 * Sous la carte « Économie potentielle » :
 
-```tsx
+\`\`\`tsx
 <p className="text-xs text-gray-500 mt-2">
   Économie calculée sur un prix moyen de 4 €/m³
 </p>
-```
+\`\`\`
 
 ### 4.3  Taux de couverture – texte invisible
 
-```tsx
+\`\`\`tsx
 const textColor = coveragePercentage < 30 ? "text-slate-900 dark:text-white" : "text-white";
 <div className={`absolute … font-bold ${textColor}`}>{formatNumber(data.coverageRate,1)}%</div>
-```
+\`\`\`
 
 ### 4.4  Graphiques précipitations non affichés
 
@@ -248,14 +248,14 @@ const textColor = coveragePercentage < 30 ? "text-slate-900 dark:text-white" : "
 
 ### Annexe – Snippet anti-double-clic vanilla
 
-```ts
+\`\`\`ts
 const guard = (fn:()=>Promise<void>|void)=>{
   let busy=false;
   return async ()=>{ if(busy) return;
     busy=true; try{ await fn(); } finally{ busy=false; }
   };
 };
-```
+\`\`\`
 
 ---
 

@@ -4,7 +4,18 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
-import { Printer, MapPin, RefreshCw, ShoppingCart, Check, Droplets, Gauge, Info } from "lucide-react"
+import {
+  Printer,
+  MapPin,
+  RefreshCw,
+  ShoppingCart,
+  Check,
+  Droplets,
+  Gauge,
+  Info,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react"
 import {
   getRecommendedTanks,
   getAllTanks,
@@ -31,6 +42,7 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   // Remove the showAllTanks state:
   // Remove the following lines:
   // const [showAllTanks, setShowAllTanks] = useState(false)
+  const [showAllTanks, setShowAllTanks] = useState(false)
 
   useEffect(() => {
     async function loadProducts() {
@@ -75,6 +87,8 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   // Remove the conditional rendering based on the showAllTanks state:
   // Remove the following line:
   // const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
+  // Determine which tanks to display based on showAllTanks state
+  const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -127,13 +141,31 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
                   </>
                 )}
               </Button> */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAllTanks(!showAllTanks)}
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                {showAllTanks ? (
+                  <>
+                    <ChevronUp className="mr-1 h-4 w-4" />
+                    Voir moins
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="mr-1 h-4 w-4" />
+                    Voir plus
+                  </>
+                )}
+              </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {/* Remove the conditional rendering based on the showAllTanks state: */}
               {/* Remove the following line: */}
               {/* {tanksToDisplay.map((tank) => ( */}
               {/* Replace it with: */}
-              {allTanks.map((tank) => (
+              {tanksToDisplay.map((tank) => (
                 <ProductCard
                   key={tank.id}
                   product={tank}

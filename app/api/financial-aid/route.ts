@@ -6,8 +6,8 @@ import type { Aid } from "@/types/financialAidTypes"
  * GET handler for financial aid API
  * Accepts query parameters:
  * - postcode: Postal code to lookup INSEE code
- * - codeInsee: INSEE code (if already known)
- * At least one parameter must be provided
+ * Always resolves the INSEE code via the Financial-Aid API
+ * commune lookup, even if a city-code was previously available
  */
 export async function GET(req: Request) {
   console.log("[API] Financial aid route called")
@@ -15,56 +15,45 @@ export async function GET(req: Request) {
   // Extract query parameters
   const { searchParams } = new URL(req.url)
   const postcode = searchParams.get("postcode")
-  const codeInsee = searchParams.get("codeInsee")
   
   // Validate parameters
-  if (!postcode && !codeInsee) {
-    console.error("[API] Financial aid route called without required parameters")
+  if (!postcode) {
+    console.error("[API] Financial aid route called without required postcode")
     return NextResponse.json(
-      { error: "Le code postal ou le code INSEE est requis" },
+      { error: "Le code postal est requis" },
       { status: 400 }
     )
   }
   
   try {
+    // ------------------------------------------------------------------
+    // 1. Resolve INSEE code *systematically* via Financial-Aid API lookup
+    // ------------------------------------------------------------------
+    console.log(`[API] Looking up INSEE code for postal code: ${postcode}`)
     let insee: string
-    
-    // Get INSEE code if not provided
-    if (codeInsee) {
-      insee = codeInsee
-      console.log(`[API] Using provided INSEE code: ${insee}`)
-    } else if (postcode) {
-      console.log(`[API] Looking up INSEE code for postal code: ${postcode}`)
-      try {
-        insee = await getInseeByPostcode(postcode)
-      } catch (error) {
-        console.error(`[API] Error getting INSEE code for postal code ${postcode}:`, error)
-        
-        // Handle specific errors from commune lookup
-        if (error instanceof Error) {
-          if (error.message.includes("Aucune commune trouvée")) {
-            return NextResponse.json(
-              { error: `Aucune commune trouvée pour le code postal ${postcode}` },
-              { status: 404 }
-            )
-          } else if (error.message.includes("authentification")) {
-            return NextResponse.json(
-              { error: "Erreur d'authentification avec le service d'aides financières" },
-              { status: 401 }
-            )
-          }
-        }
-        
+    try {
+      insee = await getInseeByPostcode(postcode)
+      console.log(`[API] Resolved INSEE code ${insee} for postal code ${postcode}`)
+    } catch (error) {
+      console.error(`[API] Error getting INSEE code for postal code ${postcode}:`, error)
+
+      if (error instanceof Error && error.message.includes("Aucune commune trouvée")) {
         return NextResponse.json(
-          { error: "Erreur lors de la recherche de la commune" },
-          { status: 500 }
+          { error: `Aucune commune trouvée pour le code postal ${postcode}` },
+          { status: 404 },
         )
       }
-    } else {
-      // This should never happen due to the earlier validation
+
+      if (error instanceof Error && error.message.includes("authentification")) {
+        return NextResponse.json(
+          { error: "Erreur d'authentification avec le service d'aides financières" },
+          { status: 401 },
+        )
+      }
+
       return NextResponse.json(
-        { error: "Le code postal ou le code INSEE est requis" },
-        { status: 400 }
+        { error: "Erreur lors de la recherche de la commune" },
+        { status: 500 },
       )
     }
     

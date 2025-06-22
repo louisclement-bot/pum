@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState, useEffect } from "react"
 import { Euro, Building, MapPin, Info } from "lucide-react"
+import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
   data: SimulatorData
@@ -14,54 +15,61 @@ type FinancialAidProps = {
   prevStep: () => void
 }
 
-type Aid = {
-  id: string
-  name: string
-  organization: string
-  amount: string
-  conditions: string
-  icon: React.ReactNode
-}
-
 export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidProps) {
   const [aids, setAids] = useState<Aid[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // In a real implementation, this would call the financial aid API
     const fetchAids = async () => {
+      // Reset states
       setIsLoading(true)
+      setError(null)
+      setAids([])
 
-      // Simulate API call
-      setTimeout(() => {
-        // Mock data - in a real implementation, this would come from the API
-        // Note: Removed the "Crédit d'impôt développement durable" aid
-        const mockAids: Aid[] = [
-          {
-            id: "1",
-            name: "Aide à la récupération d'eau de pluie",
-            organization: "Agence de l'eau",
-            amount: "Jusqu'à 1000€",
-            conditions: "Pour les particuliers, sous conditions de ressources",
-            icon: <Euro className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />,
-          },
-          {
-            id: "3",
-            name: "Subvention locale",
-            organization: `Ville de ${data.city || "votre commune"}`,
-            amount: "200€ forfaitaires",
-            conditions: "Pour l'installation d'une cuve d'au moins 1000L",
-            icon: <Building className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />,
-          },
-        ]
+      // Prefer INSEE code if available (may be attached by AddressSearch)
+      const codeInsee = data.citycode
+      const postcode = data.postalCode
 
-        setAids(mockAids)
+      if (!codeInsee && !postcode) {
+        setError("Code postal manquant – impossible de rechercher les aides financières.")
         setIsLoading(false)
-      }, 1500)
+        return
+      }
+
+      const params = new URLSearchParams()
+      if (codeInsee) {
+        params.append("codeInsee", codeInsee)
+      } else if (postcode) {
+        params.append("postcode", postcode)
+      }
+
+      try {
+        console.debug("[FinancialAid] Fetching aids with params:", params.toString())
+        const res = await fetch(`/api/financial-aid?${params.toString()}`)
+        const json = await res.json()
+
+        if (!res.ok) {
+          // API error propagated
+          throw new Error(json.error || "Erreur inconnue")
+        }
+
+        if (Array.isArray(json.aids)) {
+          setAids(json.aids)
+        } else {
+          setAids([])
+        }
+      } catch (e: any) {
+        console.error("[FinancialAid] Error while fetching aids:", e)
+        setError(e.message || "Une erreur est survenue lors de la récupération des aides.")
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     fetchAids()
-  }, [data.city])
+    // Depend on postalCode / citycode changes
+  }, [data.postalCode, data.citycode])
 
   return (
     <div className="space-y-8">
@@ -140,6 +148,14 @@ export default function FinancialAid({ data, nextStep, prevStep }: FinancialAidP
               détails et vérifier votre éligibilité.
             </p>
           </div>
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-100 dark:border-red-800 max-w-3xl mx-auto">
+          <div className="flex items-center mb-4">
+            <Info className="h-6 w-6 text-red-600 dark:text-red-400 mr-3" />
+            <h3 className="text-lg font-medium text-red-700 dark:text-red-300">Erreur</h3>
+          </div>
+          <p className="text-red-700 dark:text-red-300 ml-9">{error}</p>
         </div>
       ) : (
         <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-100 dark:border-blue-800 max-w-3xl mx-auto">

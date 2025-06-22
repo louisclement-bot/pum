@@ -33,6 +33,8 @@ export type SimulatorData = {
   address?: string
   postalCode?: string
   city?: string
+  /** Code INSEE de la commune (citycode) */
+  citycode?: string
   latitude?: number
   longitude?: number
 

@@ -16,12 +16,13 @@ export async function GET(req: Request) {
   // Extract query parameters
   const { searchParams } = new URL(req.url)
   const postcode = searchParams.get("postcode")
+  const codeInseeParam = searchParams.get("codeInsee")
   
   // Validate parameters
-  if (!postcode) {
-    console.error("[API] Financial aid route called without required postcode")
+  if (!postcode && !codeInseeParam) {
+    console.error("[API] Financial aid route called without postcode or codeInsee")
     return NextResponse.json(
-      { error: "Le code postal est requis" },
+      { error: "Le code postal ou le code INSEE est requis" },
       { status: 400 }
     )
   }
@@ -30,12 +31,18 @@ export async function GET(req: Request) {
     // ------------------------------------------------------------------
     // 1. Resolve INSEE code systematically via Financial-Aid API lookup
     // ------------------------------------------------------------------
-    console.log(`[API] Looking up INSEE code for postal code: ${postcode}`)
     let insee: string
-    try {
-      insee = await getInseeByPostcode(postcode)
-      console.log(`[API] Resolved INSEE code ${insee} for postal code ${postcode}`)
-    } catch (error) {
+
+    if (codeInseeParam) {
+      insee = codeInseeParam
+      console.log(`[API] Using provided codeInsee: ${insee}`)
+    } else {
+      // Fallback to postcode → INSEE resolution
+      console.log(`[API] Looking up INSEE code for postal code: ${postcode}`)
+      try {
+        insee = await getInseeByPostcode(postcode!)
+        console.log(`[API] Resolved INSEE code ${insee} for postal code ${postcode}`)
+      } catch (error) {
       console.error(`[API] Error getting INSEE code for postal code ${postcode}:`, error)
         
       // Handle specific errors from commune lookup
@@ -57,6 +64,7 @@ export async function GET(req: Request) {
         { error: "Erreur lors de la recherche de la commune" },
         { status: 500 }
       )
+    }
     }
     
     // Get financial aids with the INSEE code

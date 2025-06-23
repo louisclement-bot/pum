@@ -173,7 +173,7 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                       <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
                     </div>
                   </div>
-
+                  
                   {/* Toggle details button */}
                   <div className="mt-4">
                     <Button

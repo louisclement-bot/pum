@@ -11,7 +11,7 @@ import PrecipitationCompositionChart from "./rainfall-charts/precipitation-compo
 import RainfallDataTable from "./rainfall-charts/rainfall-data-table"
 import type { DetailedPluviometryData } from "@/lib/pluvioService"
 import { getDetailedPluviometryData } from "@/lib/pluvioService"
-import type { SimulatorData } from "./rainwater-simulator"
+import type { SimulatorData } from "../rainwater-simulator"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 
@@ -26,7 +26,7 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [dataSource, setDataSource] = useState<string>("unknown")
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   // Function to fetch rainfall data with retry logic
   const fetchRainfallData = useCallback(async () => {
@@ -184,62 +184,56 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
           />
         </div>
 
-        {/* Tabs - always visible */}
-        <Tabs defaultValue="monthly" className="w-full">
-          <TabsList className="w-full justify-start mb-4 bg-slate-100 dark:bg-slate-800 overflow-x-auto">
-            <TabsTrigger value="monthly" className="flex items-center gap-2">
-              <BarChart2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Précipitations</span> mensuelles
-            </TabsTrigger>
-            <TabsTrigger value="cumulative" className="flex items-center gap-2">
-              <Droplets className="h-4 w-4" />
-              <span className="hidden sm:inline">Précipitations</span> cumulées
-            </TabsTrigger>
-            <TabsTrigger value="composition" className="flex items-center gap-2">
-              <CloudRain className="h-4 w-4" />
-              Composition
-            </TabsTrigger>
-            <TabsTrigger value="table" className="flex items-center gap-2">
-              <TableIcon className="h-4 w-4" />
-              Tableau
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Create a grid container for stacking all TabsContent components */}
-          <div className="grid grid-cols-1 grid-rows-1 w-full">
-            <TabsContent value="monthly" className="mt-4" forceMount>
-              <MonthlyRainfallChart data={rainfallData.monthlyData} />
-            </TabsContent>
-
-            <TabsContent value="cumulative" className="mt-4" forceMount>
-              <CumulativeRainfallChart data={rainfallData.monthlyData} />
-            </TabsContent>
-
-            <TabsContent value="composition" className="mt-4" forceMount>
-              <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
-            </TabsContent>
-
-            <TabsContent value="table" className="mt-4" forceMount>
-              <RainfallDataTable data={rainfallData.monthlyData} />
-            </TabsContent>
-          </div>
-        </Tabs>
-
-        {/* Source information - collapsible */}
+        {/* Collapsible section for charts and source info */}
         <motion.div
           initial={false}
           animate={{
             height: isExpanded ? "auto" : "0px",
             opacity: isExpanded ? 1 : 0,
-            marginBottom: isExpanded ? "1rem" : "0",
           }}
           transition={{
             height: { duration: 0.3, ease: "easeInOut" },
             opacity: { duration: 0.2, ease: "easeInOut" },
           }}
-          className="overflow-hidden mt-4"
+          className="overflow-hidden"
         >
-          <div className="text-xs text-slate-500 dark:text-slate-400 italic">
+          <Tabs defaultValue="monthly" className="w-full">
+            <TabsList className="w-full justify-start mb-4 bg-slate-100 dark:bg-slate-800 overflow-x-auto">
+              <TabsTrigger value="monthly" className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Précipitations</span> mensuelles
+              </TabsTrigger>
+              <TabsTrigger value="cumulative" className="flex items-center gap-2">
+                <Droplets className="h-4 w-4" />
+                <span className="hidden sm:inline">Précipitations</span> cumulées
+              </TabsTrigger>
+              <TabsTrigger value="composition" className="flex items-center gap-2">
+                <CloudRain className="h-4 w-4" />
+                Composition
+              </TabsTrigger>
+              <TabsTrigger value="table" className="flex items-center gap-2">
+                <TableIcon className="h-4 w-4" />
+                Tableau
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="grid grid-cols-1 grid-rows-1 w-full">
+              <TabsContent value="monthly" className="mt-4">
+                <MonthlyRainfallChart data={rainfallData.monthlyData} />
+              </TabsContent>
+              <TabsContent value="cumulative" className="mt-4">
+                <CumulativeRainfallChart data={rainfallData.monthlyData} />
+              </TabsContent>
+              <TabsContent value="composition" className="mt-4">
+                <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
+              </TabsContent>
+              <TabsContent value="table" className="mt-4">
+                <RainfallDataTable data={rainfallData.monthlyData} />
+              </TabsContent>
+            </div>
+          </Tabs>
+
+          <div className="text-xs text-slate-500 dark:text-slate-400 italic mt-4">
             Source:{" "}
             {dataSource === "USER_INPUT"
               ? "Données saisies manuellement."

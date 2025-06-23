@@ -111,9 +111,21 @@ export function formatAmount(montantCalcule: number | null, montants: ApiAidAmou
   }
   
   if (montants && montants.length > 0) {
+    /* ----------------------------------------------------------------
+     * Each ApiAidAmount now has three possible numeric sources:
+     *  - current.plafond?.valeur  (highest priority if defined)
+     *  - current.valeur_max       (legacy «valeur_max» field)
+     *  - current.valeur           (base value)
+     * We take the greatest of any of those across the array.
+     * -------------------------------------------------------------- */
     const highestAmount = montants.reduce((max, current) => {
-      const value = current.valeur_max || current.valeur
-      return value > max ? value : max
+      const candidates = [
+        current.plafond?.valeur ?? 0,
+        current.valeur_max ?? 0,
+        current.valeur ?? 0,
+      ]
+      const localMax = Math.max(...candidates)
+      return localMax > max ? localMax : max
     }, 0)
     
     if (highestAmount > 0) {
@@ -149,12 +161,15 @@ export function formatConditions(
   }
 
   /* ------------------------------------------------------------------
-   * 2. Extract all condition labels and join them                      *
+   * 2. Recursively collect conditions from groups & nested groupes_fils
    * ------------------------------------------------------------------ */
-  const conditions = groups
-    .flatMap(group => group.conditions || [])
-    .map(condition => condition.libelle)
-    .filter(Boolean)
+  const collectConditions = (group: ApiAidGroup): string[] => {
+    const direct = (group.conditions || []).map(c => c.libelle).filter(Boolean)
+    const nested = (group.groupes_fils || []).flatMap(collectConditions)
+    return [...direct, ...nested]
+  }
+
+  const conditions = groups.flatMap(collectConditions).filter(Boolean)
   
   if (conditions.length === 0) {
     return "Conditions non spécifiées"

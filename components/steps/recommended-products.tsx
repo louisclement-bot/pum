@@ -18,7 +18,7 @@ import {
 } from "lucide-react"
 import {
   getRecommendedTanks,
-  getAllTanks,
+  getAdditionalRecommendedTanks,
   getCompatiblePumps,
   isBestsellerProduct,
   getProductFeatures,
@@ -35,13 +35,11 @@ type RecommendedProductsProps = {
 
 export default function RecommendedProducts({ data, prevStep, restart }: RecommendedProductsProps) {
   const [recommendedTanks, setRecommendedTanks] = useState<Product[]>([])
-  const [allTanks, setAllTanks] = useState<Product[]>([])
+  const [additionalTanks, setAdditionalTanks] = useState<Product[]>([])
   const [recommendedPumps, setRecommendedPumps] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // Remove the showAllTanks state:
-  // Remove the following lines:
-  // const [showAllTanks, setShowAllTanks] = useState(false)
+
   const [showAllTanks, setShowAllTanks] = useState(false)
 
   useEffect(() => {
@@ -58,12 +56,13 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
         )
         setRecommendedTanks(tanks)
 
-        // Get all tanks for "View More" functionality
-        // Remove the following line:
-        // const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
-        // Replace it with:
-        const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
-        setAllTanks(allTankOptions)
+        // Get additional 9 tanks (max) for "Voir plus", excluding the top 3
+        const moreTanks = await getAdditionalRecommendedTanks(
+          data.recommendedTankSize || 0,
+          data.usages || [],
+          tanks,
+        )
+        setAdditionalTanks(moreTanks)
 
         // Get compatible pumps based on usage AND recommended tanks
         // Pass the tanks to getCompatiblePumps for better pump recommendations
@@ -85,11 +84,7 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   }, [data.recommendedTankSize, data.usages])
 
   // Determine which tanks to display based on showAllTanks state
-  // Remove the conditional rendering based on the showAllTanks state:
-  // Remove the following line:
-  // const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
-  // Determine which tanks to display based on showAllTanks state
-  const tanksToDisplay = showAllTanks ? allTanks : recommendedTanks
+  const tanksToDisplay = showAllTanks ? [...recommendedTanks, ...additionalTanks] : recommendedTanks
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -122,26 +117,6 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
                   Cuves recommandées
                 </h3>
               </div>
-              {/* Remove the "Voir plus" button: */}
-              {/* Remove the following lines: */}
-              {/* <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAllTanks(!showAllTanks)}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                {showAllTanks ? (
-                  <>
-                    <ChevronUp className="mr-1 h-4 w-4" />
-                    Voir moins
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="mr-1 h-4 w-4" />
-                    Voir plus
-                  </>
-                )}
-              </Button> */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -162,10 +137,6 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
               </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {/* Remove the conditional rendering based on the showAllTanks state: */}
-              {/* Remove the following line: */}
-              {/* {tanksToDisplay.map((tank) => ( */}
-              {/* Replace it with: */}
               {tanksToDisplay.map((tank) => (
                 <ProductCard
                   key={tank.id}

@@ -3,27 +3,31 @@ import type { Aid } from "@/types/financialAidTypes"
 /**
  * Fetches financial aids from the API based on postal code or INSEE code
  * @param postalCode - The postal code to lookup
- * @param insee - The INSEE code (if already known)
+ * The Financial-Aid public service **requires** a two-step flow:
+ *   1.  GET /v4/communes/{postcode}  → authoritative INSEE code
+ *   2.  GET /v4/redp/{insee}         → actual aids
+ *
+ * Our `/api/financial-aid` proxy performs those two calls server-side, so the
+ * front-end only needs to supply the postal code.  The INSEE code (even if we
+ * obtained it earlier from BAN) must **not** be sent directly.
+ *
  * @returns Promise resolving to an array of Aid objects for UI display
  */
-export async function fetchFinancialAids(postalCode?: string, insee?: string): Promise<Aid[]> {
-  // If no parameters provided, return empty array
-  if (!postalCode && !insee) {
-    console.log("[AID_FETCH] No postal code or INSEE code provided, returning empty array")
+export async function fetchFinancialAids(postalCode?: string): Promise<Aid[]> {
+  const trimmedPostcode = postalCode?.trim() ?? ""
+
+  // Guard clause: postal code is mandatory
+  if (trimmedPostcode.length === 0) {
+    console.log("[AID_FETCH] No postal code provided, returning empty array")
     return []
   }
 
   const startTime = performance.now()
   const params = new URLSearchParams()
   
-  // Prioritize INSEE code if available
-  if (insee) {
-    params.append("codeInsee", insee)
-    console.log(`[AID_FETCH] Starting fetch with INSEE code: ${insee}`)
-  } else if (postalCode) {
-    params.append("postcode", postalCode)
-    console.log(`[AID_FETCH] Starting fetch with postal code: ${postalCode}`)
-  }
+  // Always forward the postal code – backend will resolve INSEE then aids
+  params.append("postcode", trimmedPostcode)
+  console.log(`[AID_FETCH] Starting fetch with postal code: ${trimmedPostcode}`)
 
   try {
     // Use AbortController for 8-second timeout

@@ -195,6 +195,72 @@ export async function getAllTanks(recommendedSize: number): Promise<Product[]> {
 }
 
 /**
+ * Gets up to 9 **additional** tanks (after the Top-3) following business rules.
+ * Ensures no duplication with the supplied `topProducts`.
+ *
+ * Rules (9 products max):
+ *  • Mixed usage (interior + garden)   → 6 buried + 3 aerial
+ *  • Interior only                    → 9 buried
+ *  • Garden only                      → 5 aerial + 4 buried
+ *
+ * Products are first sorted by `display_priority`, then by volume proximity.
+ */
+export async function getAdditionalRecommendedTanks(
+  recommendedSize: number,
+  usages: string[],
+  topProducts: Product[],
+): Promise<Product[]> {
+  const products = await fetchProducts();
+  const excludeIds = new Set(topProducts.map((p) => p.id));
+
+  const needsInteriorUsage = usages.includes("toilet") || usages.includes("washing");
+  const hasGardenUsage = usages.includes("garden");
+  const isMixedUsage = needsInteriorUsage && hasGardenUsage;
+
+  // Helper: common filter for eligibility
+  const isEligibleTank = (p: Product) =>
+    (p.type === "aerial" || p.type === "buried") &&
+    !excludeIds.has(p.id) &&
+    p.volume !== null &&
+    p.volume >= recommendedSize &&
+    p.volume <= recommendedSize * 5;
+
+  const buriedTanks = sortByPriority(
+    products.filter((p) => p.type === "buried" && isEligibleTank(p)),
+  );
+  const aerialTanks = sortByPriority(
+    products.filter((p) => p.type === "aerial" && isEligibleTank(p)),
+  );
+
+  const additional: Product[] = [];
+
+  // Helper to pull from a list up to n items.
+  const take = (source: Product[], n: number) => {
+    const taken = source.splice(0, n);
+    additional.push(...taken);
+  };
+
+  if (isMixedUsage) {
+    take(buriedTanks, 6);
+    take(aerialTanks, 3);
+  } else if (needsInteriorUsage) {
+    take(buriedTanks, 9);
+  } else {
+    // Garden only
+    take(aerialTanks, 5);
+    take(buriedTanks, 4);
+  }
+
+  // Fallback fill to reach up to 9 if some buckets were short
+  if (additional.length < 9) {
+    const remaining = sortByPriority([...buriedTanks, ...aerialTanks]);
+    additional.push(...remaining.slice(0, 9 - additional.length));
+  }
+
+  return additional.slice(0, 9);
+}
+
+/**
  * Gets compatible pumps based on usage and tank type
  * @param usages Array of usage types (garden, toilet, washing)
  * @param recommendedTanks Array of recommended tanks

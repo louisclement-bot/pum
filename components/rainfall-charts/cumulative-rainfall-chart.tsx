@@ -4,7 +4,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
-import { useChartVisibility } from "@/hooks/use-chart-visibility"
 
 interface CumulativeRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -15,8 +14,6 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // SSR / hydration helper
-  // Manage visibility & resize (important when chart is inside tabs)
-  const { ref: containerRef, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -61,13 +58,13 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   }
 
   return (
-    <div ref={containerRef} className={`w-full h-[300px] ${className}`}>
+    <div className={`w-full h-[300px] ${className}`}>
       {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height="100%" key={updateTrigger}>
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
             margin={{

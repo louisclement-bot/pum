@@ -205,21 +205,24 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="monthly" className="mt-4" forceMount>
-            <MonthlyRainfallChart data={rainfallData.monthlyData} />
-          </TabsContent>
+          {/* Create a grid container for stacking all TabsContent components */}
+          <div className="grid grid-cols-1 grid-rows-1 w-full">
+            <TabsContent value="monthly" className="mt-4" forceMount>
+              <MonthlyRainfallChart data={rainfallData.monthlyData} />
+            </TabsContent>
 
-          <TabsContent value="cumulative" className="mt-4" forceMount>
-            <CumulativeRainfallChart data={rainfallData.monthlyData} />
-          </TabsContent>
+            <TabsContent value="cumulative" className="mt-4" forceMount>
+              <CumulativeRainfallChart data={rainfallData.monthlyData} />
+            </TabsContent>
 
-          <TabsContent value="composition" className="mt-4" forceMount>
-            <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
-          </TabsContent>
+            <TabsContent value="composition" className="mt-4" forceMount>
+              <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
+            </TabsContent>
 
-          <TabsContent value="table" className="mt-4" forceMount>
-            <RainfallDataTable data={rainfallData.monthlyData} />
-          </TabsContent>
+            <TabsContent value="table" className="mt-4" forceMount>
+              <RainfallDataTable data={rainfallData.monthlyData} />
+            </TabsContent>
+          </div>
         </Tabs>
 
         {/* Source information - collapsible */}

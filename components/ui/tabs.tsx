@@ -49,14 +49,16 @@ const TabsContent = React.forwardRef<
     className={cn(
       "mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300",
       /* ------------------------------------------------------------------
-         Stack all panels in the same grid cell so they all have the same
-         dimensions. Control visibility with opacity instead of positioning.
-         This ensures chart containers always have correct dimensions.
+         New strategy:
+         • Keep panels mounted (forceMount) so expensive children initialise once.
+         • Inactive panels are moved far off-screen with `absolute` positioning
+           while preserving their natural width/height so libraries like
+           Recharts can measure dimensions correctly at mount time.
       ------------------------------------------------------------------ */
-      "grid-row-1 grid-col-1", // All panels occupy the same grid cell
-      "transition-opacity duration-300", // Smooth transition between panels
-      "data-[state=inactive]:opacity-0 data-[state=inactive]:pointer-events-none", // Hide inactive panels
-      "data-[state=active]:opacity-100 data-[state=active]:z-10", // Show active panel on top
+      "transition-opacity duration-300",
+      "data-[state=inactive]:opacity-0 data-[state=inactive]:pointer-events-none",
+      "data-[state=inactive]:absolute data-[state=inactive]:-left-[200vw] data-[state=inactive]:top-0",
+      "data-[state=active]:opacity-100 data-[state=active]:relative",
       className,
     )}
     {...props}
@@ -64,17 +66,4 @@ const TabsContent = React.forwardRef<
 ))
 TabsContent.displayName = TabsPrimitive.Content.displayName
 
-// Modified Tabs component that wraps content in a grid container
-const TabsContentGrid = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> & {
-    wrapperClassName?: string;
-  }
->(({ className, wrapperClassName, ...props }, ref) => (
-  <div className={cn("grid grid-cols-1 grid-rows-1", wrapperClassName)}>
-    <TabsContent ref={ref} className={className} {...props} />
-  </div>
-))
-TabsContentGrid.displayName = "TabsContentGrid"
-
-export { Tabs, TabsList, TabsTrigger, TabsContent, TabsContentGrid }
+export { Tabs, TabsList, TabsTrigger, TabsContent }

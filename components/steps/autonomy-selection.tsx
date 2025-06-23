@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider"
 import StepButtons from "../ui-elements/step-buttons"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState } from "react"
+import { ceilToAvailableVolume } from "@/lib/productService"
 
 type AutonomySelectionProps = {
   data: SimulatorData
@@ -16,9 +17,9 @@ type AutonomySelectionProps = {
 export default function AutonomySelection({ data, updateData, nextStep, prevStep }: AutonomySelectionProps) {
   const [autonomy, setAutonomy] = useState<number>(data.autonomyWeeks || 2)
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // Calculate results before moving to the next step
-    const results = calculateResults({
+    const results = await calculateResults({
       ...data,
       autonomyWeeks: autonomy,
     })
@@ -33,7 +34,7 @@ export default function AutonomySelection({ data, updateData, nextStep, prevStep
 
   // Remplacer la fonction calculateResults par cette version mise à jour
 
-  const calculateResults = (data: SimulatorData) => {
+  const calculateResults = async (data: SimulatorData) => {
     // Calculate annual water collectable in m³
     const roofSurface = data.roofSurface || 0 // m²
     const annualRainfall = data.annualRainfall || 0 // mm/year
@@ -71,8 +72,10 @@ export default function AutonomySelection({ data, updateData, nextStep, prevStep
     // Utiliser le minimum entre l'eau récupérable et les besoins pour un dimensionnement optimal
     const effectiveAnnualWaterM3 = Math.min(annualWaterCollectableM3, annualWaterNeedsM3)
     const recommendedTankSizeM3 = (effectiveAnnualWaterM3 / 52) * autonomyWeeks
-    // Conversion en litres et arrondi au litre supérieur
-    const recommendedTankSize = Math.ceil(recommendedTankSizeM3 * 1000)
+    // Conversion en litres (valeur brute)
+    const rawRecommendedTankSize = recommendedTankSizeM3 * 1000
+    // Arrondi au volume de cuve disponible le plus proche (supérieur)
+    const recommendedTankSize = await ceilToAvailableVolume(rawRecommendedTankSize)
 
     // Calculate potential savings
     const potentialSavings = Math.min(annualWaterCollectableM3, annualWaterNeedsM3) // en m³

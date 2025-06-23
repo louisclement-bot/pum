@@ -33,6 +33,13 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
     })
   }
 
+  // --- Custom rounding helpers -------------------------------------------
+  // Round any value up to the next integer (e.g. 70.2 -> 71)
+  const roundUpToNearest = (val: number) => Math.ceil(val)
+
+  // Round value up to the next multiple of 5 (e.g. 280.65 -> 285)
+  const roundUpToNearest5 = (val: number) => Math.ceil(val / 5) * 5
+
   // Check if we have postal code to enable financial aid button
   const canShowFinancialAid = !!data.postalCode
 
@@ -110,7 +117,10 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           <ResultCard
             icon={<Droplets className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />}
             title="Eau récupérable"
-            value={`${formatNumber(data.annualWaterCollectable ? data.annualWaterCollectable / 1000 : 0, 1)} m³/an`}
+            value={`${formatNumber(
+              roundUpToNearest(data.annualWaterCollectable ? data.annualWaterCollectable / 1000 : 0),
+              0,
+            )} m³/an`}
             subtitle={`${formatNumber(data.annualWaterCollectable)} L/an`}
             color="blue"
           />
@@ -122,7 +132,10 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
               <DropletIcon className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />
             }
             title="Besoins en eau"
-            value={`${formatNumber(data.annualWaterNeeds ? data.annualWaterNeeds / 1000 : 0, 1)} m³/an`}
+            value={`${formatNumber(
+              roundUpToNearest(data.annualWaterNeeds ? data.annualWaterNeeds / 1000 : 0),
+              0,
+            )} m³/an`}
             subtitle={`${formatNumber(data.annualWaterNeeds)} L/an`}
             color="blue"
           />
@@ -145,8 +158,8 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           <ResultCard
             icon={<Banknote className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />}
             title="Économie potentielle"
-            value={`${formatNumber(data.potentialSavingsEuros, 2)} €/an`}
-            subtitle={`${formatNumber(data.potentialSavings, 1)} m³ d'eau potable économisés`}
+            value={`${formatNumber(roundUpToNearest5(data.potentialSavingsEuros || 0), 0)} €/an`}
+            subtitle="Calculé avec un prix moyen de 4€ par m³"
             color="blue"
           />
         </motion.div>

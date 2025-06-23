@@ -17,23 +17,64 @@ let productsCache: Product[] | null = null
  * Fetches all products from the JSON file
  */
 export async function fetchProducts(): Promise<Product[]> {
-  // Return cached products if available
+  // 1. Cache hit
   if (productsCache) {
     return productsCache
   }
 
+  /**
+   * 2. Utiliser l'import statique.  Avec `resolveJsonModule` activé
+   *    dans tsconfig (déjà le cas ici), on peut importer le catalogue
+   *    à build-time.  Cela élimine les fetch 404/HTML qui provoquaient
+   *    le `Unexpected token '<'`.
+   *
+   *    Si un fetch dynamique est nécessaire plus tard, on pourra le
+   *    réintroduire derrière un feature-flag.
+   */
   try {
-    const response = await fetch("/data/products.json")
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.status}`)
-    }
-    const products: Product[] = await response.json()
-    productsCache = products
-    return products
+    // import dynamique pour ne pas impacter le bundle SSR inutilement
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const { default: productsJson } = await import("@/public/data/products.json")
+    productsCache = productsJson as Product[]
+    return productsCache
   } catch (error) {
-    console.error("Error fetching products:", error)
+    console.error("Error loading static products.json:", error)
     return []
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Helper ‑ Volumes disponibles                                               */
+/* -------------------------------------------------------------------------- */
+
+let volumesCache: number[] | null = null
+
+/**
+ * Retourne la liste triée et unique des volumes de cuves disponibles
+ * (tanks uniquement, hors pompes), avec cache mémoire.
+ */
+export async function getAvailableTankVolumes(): Promise<number[]> {
+  if (volumesCache) return volumesCache
+
+  const products = await fetchProducts()
+  volumesCache = [...new Set(products
+    .filter((p) => p.type !== "pump" && p.volume)
+    .map((p) => p.volume as number))]
+    .sort((a, b) => a - b)
+
+  return volumesCache
+}
+
+/**
+ * Arrondit un volume calculé vers le haut pour correspondre à la
+ * prochaine taille de cuve réellement commercialisée.
+ *
+ * Ex. 1700 L → 3000 L ; 350 L → 400 L ; >20 000 L → 20 000 L
+ */
+export async function ceilToAvailableVolume(calculatedVolume: number): Promise<number> {
+  const volumes = await getAvailableTankVolumes()
+  const match = volumes.find((v) => v >= calculatedVolume)
+  return match ?? Math.max(...volumes)
 }
 
 /**

@@ -24,8 +24,7 @@ import {
   getProductFeatures,
   type Product,
 } from "@/lib/productService"
-import jsPDF from "jspdf"
-import autoTable from "jspdf-autotable"
+import { downloadSimulationPDF } from "@/lib/pdfGenerator"
 
 type RecommendedProductsProps = {
   data: SimulatorData
@@ -39,6 +38,7 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
   const [recommendedPumps, setRecommendedPumps] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [pdfGenerating, setPdfGenerating] = useState(false)
 
   const [showAllTanks, setShowAllTanks] = useState(false)
 
@@ -185,7 +185,7 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
         </p>
       </div>
 
-      {/* Action buttons (left group + right-aligned “point de vente”) */}
+      {/* Action buttons (left group + right-aligned "point de vente") */}
       <div className="flex justify-between flex-wrap gap-3 md:gap-4 mt-6 md:mt-10">
         {/* Left group */}
         <div className="flex flex-wrap gap-3 md:gap-4">
@@ -199,107 +199,22 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
 
         <Button
           variant="outline"
-          onClick={() => {
-            // Create new PDF document
-            const doc = new jsPDF()
-
-            // Add logo and title
-            doc.setFontSize(20)
-            doc.setTextColor(29, 64, 175) // #1D40AF
-            doc.text("Résultats de votre simulation", 105, 20, { align: "center" })
-
-            // Add simulation data
-            doc.setFontSize(12)
-            doc.setTextColor(0, 0, 0)
-            doc.text("Informations sur votre projet", 20, 40)
-            doc.setFontSize(10)
-            doc.text(
-              `Volume de cuve recommandé: ${data.recommendedTankSize ? (data.recommendedTankSize / 1000).toFixed(1) : 0} m³`,
-              20,
-              50,
-            )
-            doc.text(
-              `Eau récupérable par an: ${data.annualWaterCollectable ? (data.annualWaterCollectable / 1000).toFixed(1) : 0} m³`,
-              20,
-              60,
-            )
-            doc.text(
-              `Besoins en eau par an: ${data.annualWaterNeeds ? (data.annualWaterNeeds / 1000).toFixed(1) : 0} m³`,
-              20,
-              70,
-            )
-            doc.text(`Taux de couverture: ${data.coverageRate ? data.coverageRate.toFixed(1) : 0}%`, 20, 80)
-            doc.text(
-              `Économie potentielle: ${data.potentialSavingsEuros ? data.potentialSavingsEuros.toFixed(2) : 0} €/an`,
-              20,
-              90,
-            )
-
-            // Add recommended products
-            doc.setFontSize(12)
-            doc.setTextColor(29, 64, 175)
-            doc.text("Produits recommandés", 20, 110)
-
-            // Create a table for tanks
-            const tankColumns = ["Produit", "Type", "Volume"]
-            const tankRows = recommendedTanks.map((tank) => [
-              tank.name,
-              tank.type === "aerial" ? "Aérien" : "Enterré",
-              tank.volume ? `${tank.volume}L` : "-",
-            ])
-
-            autoTable(doc, {
-              head: [tankColumns],
-              body: tankRows,
-              startY: 120,
-              headStyles: { fillColor: [29, 64, 175] },
-            })
-
-            // Add pump table if we have pumps
-            if (recommendedPumps.length > 0) {
-              const pumpY = (doc as any).lastAutoTable.finalY + 20
-              doc.setFontSize(12)
-              doc.setTextColor(29, 64, 175)
-              doc.text("Pompes recommandées", 20, pumpY)
-
-              const pumpColumns = ["Produit", "Type", "Compatibilité"]
-              const pumpRows = recommendedPumps.map((pump) => [
-                pump.name,
-                "Pompe",
-                pump.compatibleWithBuriedVolumes
-                  ? `Cuves ${pump.compatibleWithBuriedVolumes.join(", ")}L`
-                  : "Toutes cuves",
-              ])
-
-              autoTable(doc, {
-                head: [pumpColumns],
-                body: pumpRows,
-                startY: pumpY + 10,
-                headStyles: { fillColor: [29, 64, 175] },
-              })
+          onClick={async () => {
+            try {
+              setPdfGenerating(true);
+              await downloadSimulationPDF(data, recommendedTanks, recommendedPumps);
+            } catch (error) {
+              console.error("Error generating PDF:", error);
+              alert("Une erreur est survenue lors de la génération du PDF. Veuillez réessayer.");
+            } finally {
+              setPdfGenerating(false);
             }
-
-            // Add footer
-            const pageCount = (doc as any).internal.getNumberOfPages()
-            for (let i = 1; i <= pageCount; i++) {
-              doc.setPage(i)
-              doc.setFontSize(8)
-              doc.setTextColor(100, 100, 100)
-              doc.text(
-                "Simulation réalisée sur mypum.fr - " + new Date().toLocaleDateString("fr-FR"),
-                105,
-                doc.internal.pageSize.height - 10,
-                { align: "center" },
-              )
-            }
-
-            // Save the PDF
-            doc.save("simulation-recuperation-eau-pluie.pdf")
           }}
+          disabled={pdfGenerating}
           className="flex-1 sm:flex-none py-2 md:py-6 border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 text-sm md:text-base"
         >
           <Printer className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
-          Imprimer
+          {pdfGenerating ? "Génération..." : "Imprimer"}
         </Button>
 
         {/* Recommencer – now outline */}
@@ -314,7 +229,7 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
 
         </div>
 
-        {/* Right-aligned “Trouver un point de vente” */}
+        {/* Right-aligned "Trouver un point de vente" */}
         <Button
           onClick={() => {
             const baseUrl = "https://www.mypum.fr/agence"

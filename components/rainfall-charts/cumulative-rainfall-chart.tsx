@@ -1,9 +1,10 @@
 "use client"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import { useChartVisibility } from "@/hooks/use-chart-visibility"
 
 interface CumulativeRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -14,7 +15,8 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // SSR / hydration helper
-  const chartRef = useRef<HTMLDivElement>(null)
+  // Manage visibility & resize (important when chart is inside tabs)
+  const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -59,13 +61,13 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   }
 
   return (
-    <div ref={chartRef} className={`w-full h-[300px] ${className}`}>
-      {!mounted ? (
+    <div ref={containerRef} className={`w-full h-[300px] ${className}`}>
+      {!(mounted && isVisible) ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" key={updateTrigger}>
           <LineChart
             data={chartData}
             margin={{

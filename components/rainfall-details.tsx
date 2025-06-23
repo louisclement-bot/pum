@@ -205,15 +205,15 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="monthly" className="mt-4">
+          <TabsContent value="monthly" className="mt-4" forceMount>
             <MonthlyRainfallChart data={rainfallData.monthlyData} />
           </TabsContent>
 
-          <TabsContent value="cumulative" className="mt-4">
+          <TabsContent value="cumulative" className="mt-4" forceMount>
             <CumulativeRainfallChart data={rainfallData.monthlyData} />
           </TabsContent>
 
-          <TabsContent value="composition" className="mt-4">
+          <TabsContent value="composition" className="mt-4" forceMount>
             <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
           </TabsContent>
 

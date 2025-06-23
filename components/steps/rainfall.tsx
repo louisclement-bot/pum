@@ -40,6 +40,32 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     }
   }, [data.postalCode, data.annualRainfall, data.rainfallDataSource])
 
+  /**
+   * Allow the user to reset postcode-related data so they can enter a new one.
+   * Clears both the parent simulator state and this component’s local state.
+   */
+  const handleModifyZipcode = () => {
+    // 1. Reset data in parent
+    updateData({
+      city: undefined,
+      postalCode: undefined,
+      annualRainfall: undefined,
+      latitude: undefined,
+      longitude: undefined,
+      rainfallDataSource: undefined,
+      detailedPrecipitationData: undefined,
+    })
+
+    // 2. Reset local UI state
+    setPostalCode("")
+    setRainfall(0)
+    setCoordinates(null)
+    setDataSource("none")
+    setError(null)
+    setIsLoading(false)
+    setManualInput(false)
+  }
+
   const fetchRainfall = async (code: string) => {
     setIsLoading(true)
     setError(null)
@@ -165,7 +191,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const handleNext = async () => {
     // Prepare data update object
     const dataUpdate: Partial<SimulatorData> = {
-      annualRainfall: rainfall,
+      // If the local state has a value (> 0) use it, otherwise keep the one
+      // already stored in the parent simulator state.
+      annualRainfall: rainfall || data.annualRainfall,
       postalCode: postalCode || data.postalCode,
       rainfallDataSource: dataSource,
     }
@@ -226,6 +254,14 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
               <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
                 Basé sur votre adresse à <span className="font-bold">{data.city}</span>
               </p>
+              {/* Button to allow user to change the postcode */}
+              <Button
+                variant="link"
+                onClick={handleModifyZipcode}
+                className="mt-2 text-blue-600 dark:text-blue-400 text-sm p-0 h-auto"
+              >
+                Modifier votre code postal
+              </Button>
             </div>
           </div>
         )}
@@ -391,7 +427,10 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       <StepButtons
         onNext={handleNext}
         onPrev={prevStep}
-        nextDisabled={!rainfall || rainfall <= 0}
+        /* Disable only if neither local nor parent rainfall is valid */
+        nextDisabled={
+          ((!rainfall || rainfall <= 0) && (!data.annualRainfall || data.annualRainfall <= 0))
+        }
         nextLabel="Continuer"
       />
     </div>

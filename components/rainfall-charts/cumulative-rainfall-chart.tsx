@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import { useChartVisibility } from "@/hooks/use-chart-visibility"
 
 interface CumulativeRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -14,6 +15,8 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // SSR / hydration helper
+  // observe visibility & container resize
+  const { ref, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -46,7 +49,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
       maxValue: max,
       firstItem: formattedData[0],
     })
-  }, [data])
+  }, [data, updateTrigger]) // re-run when container becomes visible / resizes
 
   // If no data, don't render
   if (!chartData || chartData.length === 0) {
@@ -58,13 +61,19 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   }
 
   return (
-    <div className={`w-full h-[300px] ${className}`}>
+    {/* attach visibility/resize observer ref */}
+    <div ref={ref} className={`w-full h-[300px] ${className}`}>
       {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          /* force remount when container becomes visible or resizes */
+          key={updateTrigger}
+        >
           <LineChart
             data={chartData}
             margin={{
@@ -136,3 +145,5 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
     </div>
   )
 }
+
+    <div ref={ref} className={`w-full h-[300px] ${className}`}>

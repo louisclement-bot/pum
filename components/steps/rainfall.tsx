@@ -231,7 +231,8 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
      * ──────────────────────────────── */
     try {
       setFetchingAids(true)
-      const aids = await fetchFinancialAids(dataUpdate.postalCode || data.postalCode, data.citycode)
+      // Always start with the postal code (Financial-Aid API will resolve INSEE internally)
+      const aids = await fetchFinancialAids(dataUpdate.postalCode || data.postalCode)
       dataUpdate.financialAids = aids
       console.log("[AID_FETCH] Stored", aids.length, "financial aids into SimulatorData")
     } catch (e) {

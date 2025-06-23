@@ -1,8 +1,9 @@
 "use client"
-import { useEffect, useState, useRef, Component, ErrorInfo } from "react"
+import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import { useChartVisibility } from "@/hooks/use-chart-visibility"
 
 interface PrecipitationCompositionChartProps {
   rain: number
@@ -17,7 +18,7 @@ export default function PrecipitationCompositionChart({
 }: PrecipitationCompositionChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
-  const chartRef = useRef<HTMLDivElement>(null)
+  const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -55,13 +56,19 @@ export default function PrecipitationCompositionChart({
   }
 
   return (
-    <div ref={chartRef} className={`w-full h-[300px] relative ${className}`}>
-      {!mounted ? (
+    <div ref={containerRef} className={`w-full h-[300px] relative ${className}`}>
+      {!(mounted && isVisible) ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>
       ) : (
-          <ResponsiveContainer width="100%" height="100%" debounce={50}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            debounce={50}
+            /* `key` ensures Recharts recalculates dims on visibility/resize */
+            key={updateTrigger}
+          >
         <PieChart>
           <Pie
             data={chartData}

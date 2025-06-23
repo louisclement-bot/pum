@@ -29,6 +29,45 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
   )
 
+  /**
+   * Persist freshly-fetched rainfall in the global simulator state.
+   * Doing it here – instead of waiting for “Continuer” – allows the user
+   * to go back / forth without losing the data and re-enables the
+   * “Continuer” button on their return.
+   */
+  const persistRainfall = (
+    annual: number,
+    src: string,
+    lat?: number,
+    lon?: number,
+    extra?: Awaited<ReturnType<typeof getDetailedPluviometryData>>,
+  ) => {
+    const update: Partial<SimulatorData> = {
+      annualRainfall: annual,
+      rainfallDataSource: src,
+      // Keep existing postalCode if already stored
+      postalCode: postalCode || data.postalCode,
+    }
+
+    if (lat !== undefined && lon !== undefined) {
+      update.latitude = lat
+      update.longitude = lon
+    }
+
+    if (extra) {
+      update.detailedPrecipitationData = {
+        monthlyData: extra.monthlyData,
+        totalPrecipitation: extra.totalPrecipitation,
+        totalRain: extra.totalRain,
+        totalSnow: extra.totalSnow,
+        source: extra.source,
+        period: extra.period,
+      }
+    }
+
+    updateData(update)
+  }
+
   // If we already have address data, fetch rainfall on component mount
   useEffect(() => {
     if (data.annualRainfall) {
@@ -39,6 +78,14 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       fetchRainfall(data.postalCode || postalCode)
     }
   }, [data.postalCode, data.annualRainfall, data.rainfallDataSource])
+
+  // Safety – rehydrate local state if global rainfall appears after mount
+  useEffect(() => {
+    if (!rainfall && data.annualRainfall) {
+      setRainfall(data.annualRainfall)
+      setDataSource(data.rainfallDataSource || "existing")
+    }
+  }, [data.annualRainfall])
 
   /**
    * Allow the user to reset postcode-related data so they can enter a new one.
@@ -91,6 +138,15 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
             console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
           }
 
+          // Persist to parent state immediately
+          persistRainfall(
+            Math.round(pluviometryData.value),
+            "OpenMeteo API",
+            data.latitude,
+            data.longitude,
+            detailedData,
+          )
+
           setIsLoading(false)
           return
         }
@@ -118,6 +174,14 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
             if (detailedData) {
               console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
             }
+
+            persistRainfall(
+              Math.round(pluviometryData.value),
+              "OpenMeteo API",
+              latitude,
+              longitude,
+              detailedData,
+            )
 
             setIsLoading(false)
             return
@@ -151,6 +215,14 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           if (detailedData) {
             console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
           }
+
+          persistRainfall(
+            Math.round(pluviometryData.value),
+            "OpenMeteo API",
+            latitude,
+            longitude,
+            detailedData,
+          )
 
           setIsLoading(false)
           return

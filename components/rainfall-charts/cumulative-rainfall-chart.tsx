@@ -13,10 +13,16 @@ interface CumulativeRainfallChartProps {
 export default function CumulativeRainfallChart({ data, className = "" }: CumulativeRainfallChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
+  const [mounted, setMounted] = useState(false) // SSR / hydration helper
   const chartRef = useRef<HTMLDivElement>(null)
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
+
+  // mark component as mounted (client)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Process data when it changes
   useEffect(() => {
@@ -39,6 +45,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
     console.log("Cumulative rainfall chart data processed:", {
       dataPoints: formattedData.length,
       maxValue: max,
+      firstItem: formattedData[0],
     })
   }, [data])
 
@@ -53,7 +60,12 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
 
   return (
     <div ref={chartRef} className={`w-full h-[300px] ${className}`}>
-      <ResponsiveContainer width="100%" height="100%">
+      {!mounted ? (
+        <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
+          Initialising chart…
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
           margin={{
@@ -121,6 +133,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
           />
         </LineChart>
       </ResponsiveContainer>
+      )}
     </div>
   )
 }

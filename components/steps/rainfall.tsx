@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { CloudRain, MapPin, Search, Loader2, AlertCircle, Edit3 } from "lucide-react"
 import { geocodeAddressViaBAN } from "@/lib/geocodeService"
 import { getAverageAnnualPluviometry, getDetailedPluviometryData } from "@/lib/pluvioService"
+import { fetchFinancialAids } from "@/lib/useFinancialAid"
 
 type RainfallProps = {
   data: SimulatorData
@@ -25,7 +26,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const [manualInput, setManualInput] = useState<boolean>(false)
   const [manualRainfall, setManualRainfall] = useState<string>("")
   const [dataSource, setDataSource] = useState<string>("none")
-  // Early-fetch of financial aids
   const [fetchingAids, setFetchingAids] = useState<boolean>(false)
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
@@ -41,6 +41,32 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       fetchRainfall(data.postalCode || postalCode)
     }
   }, [data.postalCode, data.annualRainfall, data.rainfallDataSource])
+
+  /**
+   * Allow the user to reset postcode-related data so they can enter a new one.
+   * Clears both the parent simulator state and this component’s local state.
+   */
+  const handleModifyZipcode = () => {
+    // 1. Reset data in parent
+    updateData({
+      city: undefined,
+      postalCode: undefined,
+      annualRainfall: undefined,
+      latitude: undefined,
+      longitude: undefined,
+      rainfallDataSource: undefined,
+      detailedPrecipitationData: undefined,
+    })
+
+    // 2. Reset local UI state
+    setPostalCode("")
+    setRainfall(0)
+    setCoordinates(null)
+    setDataSource("none")
+    setError(null)
+    setIsLoading(false)
+    setManualInput(false)
+  }
 
   const fetchRainfall = async (code: string) => {
     setIsLoading(true)
@@ -165,12 +191,11 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   }
 
   const handleNext = async () => {
-    // Avoid double trigger
-    if (fetchingAids) return
-
     // Prepare data update object
     const dataUpdate: Partial<SimulatorData> = {
-      annualRainfall: rainfall,
+      // If the local state has a value (> 0) use it, otherwise keep the one
+      // already stored in the parent simulator state.
+      annualRainfall: rainfall || data.annualRainfall,
       postalCode: postalCode || data.postalCode,
       rainfallDataSource: dataSource,
     }
@@ -199,38 +224,23 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       }
     }
 
-    /* ──────────────────────────────────────────────────────────────
-     * Early fetch of financial aids (offline-first approach)
-     * We use the official proxy route `/api/financial-aid` so that all
-     * auth logic & INSEE resolution are centralized in one place.
-     * ---------------------------------------------------------------- */
+    console.log("[DATA SOURCE] Updating SimulatorData with rainfall data source:", dataSource)
+    /* ────────────────────────────────
+     * Early-fetch financial aids
+     * ──────────────────────────────── */
     try {
       setFetchingAids(true)
-
-      const paramString = data.citycode
-        ? `codeInsee=${data.citycode}`
-        : `postcode=${postalCode || data.postalCode}`
-
-      const res = await fetch(`/api/financial-aid?${paramString}`)
-      if (res.ok) {
-        const json = await res.json()
-        dataUpdate.financialAids = Array.isArray(json.aids) ? json.aids : []
-        console.log(`[AID_FETCH] success – received ${dataUpdate.financialAids.length} aids`)
-      } else {
-        // Any non-200 is logged but not blocking
-        console.error("[AID_FETCH] error status:", res.status)
-        dataUpdate.financialAids = []
-      }
+      const aids = await fetchFinancialAids(dataUpdate.postalCode, data.citycode)
+      dataUpdate.financialAids = aids
+      console.log("[AID_FETCH] Stored", aids.length, "aids into SimulatorData")
     } catch (e) {
-      console.error("[AID_FETCH] network/error:", e)
+      console.error("[AID_FETCH] Error while fetching aids:", e)
       dataUpdate.financialAids = []
     } finally {
       setFetchingAids(false)
+      updateData(dataUpdate)
+      nextStep()
     }
-
-    console.log("[DATA SOURCE] Updating SimulatorData with rainfall data source:", dataSource)
-    updateData(dataUpdate)
-    nextStep()
   }
 
   return (
@@ -251,16 +261,28 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           </div>
         </div>
 
-        {data.city ? (
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center mb-8">
+        {!manualInput && data.city && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 md:p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center justify-between mb-8">
             <div className="bg-blue-100 dark:bg-blue-800/50 p-2 rounded-full mr-3">
               <MapPin className="h-5 w-5 text-[#1D40AF] dark:text-blue-400" />
             </div>
-            <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
-              Basé sur votre adresse à <span className="font-bold">{data.city}</span>
-            </p>
+            <div className="flex-grow">
+              <p className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                Basé sur votre adresse à <span className="font-bold">{data.city}</span>
+              </p>
+              {/* Button to allow user to change the postcode */}
+              <Button
+                variant="link"
+                onClick={handleModifyZipcode}
+                className="mt-2 text-blue-600 dark:text-blue-400 text-sm p-0 h-auto"
+              >
+                Modifier votre code postal
+              </Button>
+            </div>
           </div>
-        ) : (
+        )}
+
+        {!manualInput && !data.city && (
           <div className="space-y-4 max-w-md mx-auto mb-8">
             <div className="space-y-2">
               <Label htmlFor="postal-code" className="text-[#1D40AF] dark:text-blue-300 font-medium">
@@ -310,39 +332,56 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           </div>
         )}
 
-        {manualInput ? (
-          <div className="space-y-4 max-w-md mx-auto mb-8">
-            <div className="space-y-2">
-              <Label htmlFor="manual-rainfall" className="text-[#1D40AF] dark:text-blue-300 font-medium">
-                Pluviométrie moyenne annuelle (mm/an)
-              </Label>
-              <div className="flex gap-3">
-                <div className="relative flex-1">
-                  <Input
-                    id="manual-rainfall"
-                    value={manualRainfall}
-                    onChange={(e) => setManualRainfall(e.target.value)}
-                    placeholder="800"
-                    type="number"
-                    min="0"
-                    className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl pr-10"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleManualInputSubmit()
-                      }
-                    }}
-                  />
+        {manualInput && (
+          <>
+            <div className="text-center mb-4">
+              <Button
+                variant="link"
+                onClick={() => {
+                  setManualInput(false)
+                  setError(null)
+                  // If postalCode or data.city exists, useEffect will trigger refetch
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                {data.city || postalCode ? "Utiliser la recherche automatique" : "Rechercher par code postal"}
+              </Button>
+            </div>
+            <div className="space-y-4 max-w-md mx-auto mb-8">
+              <div className="space-y-2">
+                <Label htmlFor="manual-rainfall" className="text-[#1D40AF] dark:text-blue-300 font-medium">
+                  Pluviométrie moyenne annuelle (mm/an)
+                </Label>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Input
+                      id="manual-rainfall"
+                      value={manualRainfall}
+                      onChange={(e) => setManualRainfall(e.target.value)}
+                      placeholder="800"
+                      type="number"
+                      min="0"
+                      className="h-12 text-base border-blue-200 dark:border-blue-800 focus:border-[#1D40AF] dark:focus:border-blue-500 rounded-xl pr-10"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleManualInputSubmit()
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleManualInputSubmit}
+                    className="h-12 px-5 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <Edit3 className="h-5 w-5" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleManualInputSubmit}
-                  className="h-12 px-5 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  <Edit3 className="h-5 w-5" />
-                </Button>
               </div>
             </div>
-          </div>
-        ) : (
+          </>
+        )}
+
+        {!manualInput && (
           <div className="text-center p-6 md:p-8 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-100 dark:border-blue-800">
             {isLoading ? (
               <div className="py-8">
@@ -364,7 +403,15 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
                   </div>
                 )}
                 <Button
-                  onClick={() => setManualInput(true)}
+                  onClick={() => {
+                    setManualInput(true)
+                    if (rainfall > 0 && dataSource !== "USER_INPUT") {
+                      setManualRainfall(rainfall.toString())
+                    } else {
+                      setManualRainfall("")
+                    }
+                    setError(null)
+                  }}
                   variant="link"
                   className="mt-4 text-blue-600 dark:text-blue-400"
                 >
@@ -396,16 +443,13 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
       <StepButtons
         onNext={handleNext}
         onPrev={prevStep}
-        nextDisabled={!rainfall || rainfall <= 0 || fetchingAids}
-        nextLabel="Continuer"
+        /* Disable only if neither local nor parent rainfall is valid */
+        nextDisabled={
+          ((!rainfall || rainfall <= 0) && (!data.annualRainfall || data.annualRainfall <= 0))
+          || fetchingAids
+        }
+        nextLabel={fetchingAids ? "Recherche des aides…" : "Continuer"}
       />
-
-      {/* Discrete loader while fetching financial aids */}
-      {fetchingAids && (
-        <div className="flex justify-center mt-4">
-          <Loader2 className="h-6 w-6 animate-spin text-[#1D40AF] dark:text-blue-400" />
-        </div>
-      )}
     </div>
   )
 }

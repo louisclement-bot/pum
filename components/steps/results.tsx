@@ -33,13 +33,24 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
     })
   }
 
-  // ------------------------------------------------------------------
-  // Financial aid button – early-fetch aware
-  // ------------------------------------------------------------------
-  // Prefer the freshly fetched aids if present, otherwise keep the old
-  // postal-code fallback so the UX isn’t broken if the early fetch fails.
+  // --- Custom rounding helpers -------------------------------------------
+  // Round any value up to the next integer (e.g. 70.2 -> 71)
+  const roundUpToNearest = (val: number) => Math.ceil(val)
+
+  // Round value up to the next multiple of 5 (e.g. 280.65 -> 285)
+  const roundUpToNearest5 = (val: number) => Math.ceil(val / 5) * 5
+
+  // ────────────────────────────────
+  // Financial aid button logic
+  //  • primary condition  : at least one aid fetched early
+  //  • fallback condition : we still have a postcode (legacy behaviour)
+  // ────────────────────────────────
   const aidsCount = data.financialAids?.length ?? 0
   const canShowFinancialAid = aidsCount > 0 || !!data.postalCode
+  const aidLabel =
+    aidsCount > 0
+      ? `Voir les ${aidsCount} aide${aidsCount > 1 ? "s" : ""} disponibles`
+      : "Voir les aides disponibles"
 
   // Animation variants
   const containerVariants = {
@@ -115,7 +126,10 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           <ResultCard
             icon={<Droplets className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />}
             title="Eau récupérable"
-            value={`${formatNumber(data.annualWaterCollectable ? data.annualWaterCollectable / 1000 : 0, 1)} m³/an`}
+            value={`${formatNumber(
+              roundUpToNearest(data.annualWaterCollectable ? data.annualWaterCollectable / 1000 : 0),
+              0,
+            )} m³/an`}
             subtitle={`${formatNumber(data.annualWaterCollectable)} L/an`}
             color="blue"
           />
@@ -127,7 +141,10 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
               <DropletIcon className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />
             }
             title="Besoins en eau"
-            value={`${formatNumber(data.annualWaterNeeds ? data.annualWaterNeeds / 1000 : 0, 1)} m³/an`}
+            value={`${formatNumber(
+              roundUpToNearest(data.annualWaterNeeds ? data.annualWaterNeeds / 1000 : 0),
+              0,
+            )} m³/an`}
             subtitle={`${formatNumber(data.annualWaterNeeds)} L/an`}
             color="blue"
           />
@@ -150,8 +167,8 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           <ResultCard
             icon={<Banknote className="h-8 w-8 md:h-10 md:w-10 text-blue-500 dark:text-blue-400 print:text-blue-700" />}
             title="Économie potentielle"
-            value={`${formatNumber(data.potentialSavingsEuros, 2)} €/an`}
-            subtitle={`${formatNumber(data.potentialSavings, 1)} m³ d'eau potable économisés`}
+            value={`${formatNumber(roundUpToNearest5(data.potentialSavingsEuros || 0), 0)} €/an`}
+            subtitle="Calculé avec un prix moyen de 4€ par m³"
             color="blue"
           />
         </motion.div>
@@ -232,26 +249,15 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           Précédent
         </Button>
 
-        {canShowFinancialAid &&
-          (aidsCount > 0 ? (
-            <Button
-              onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
-              className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
-            >
-              {`Voir les ${aidsCount} aide${aidsCount > 1 ? "s" : ""} disponibles`}
-              <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
-            </Button>
-          ) : (
-            !!data.postalCode && (
-              <Button
-                onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
-                className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
-              >
-                Voir les aides disponibles
-                <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
-              </Button>
-            )
-          ))}
+        {canShowFinancialAid && (
+          <Button
+            onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
+            className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
+          >
+            {aidLabel}
+            <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
+          </Button>
+        )}
 
         <Button
           onClick={() => goToStep(STEP_IDS.PRODUCTS)}

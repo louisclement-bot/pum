@@ -50,28 +50,8 @@ export type SimulatorData = {
   potentialSavings?: number // in m³
   potentialSavingsEuros?: number // in euros
   coverageRate?: number // percentage
-
-  // Metadata about rainfall information
-  /**
-   * Source of the rainfall value (e.g. "OpenMeteo API", "USER_INPUT", etc.)
-   */
-  rainfallDataSource?: string
-
-  /**
-   * Detailed precipitation information returned by the weather service.
-   * Stored so we can display breakdowns without additional network calls.
-   */
-  detailedPrecipitationData?: {
-    monthlyData: number[]
-    totalPrecipitation: number
-    totalRain: number
-    totalSnow: number
-    source: string
-    period: string
-  }
-
-  // Early-fetched financial aids (offline-first)
-  financialAids?: Aid[] // NEW
+  // Financial aid fetched early in the flow
+  financialAids?: Aid[]
 }
 
 // Define step structure for clarity
@@ -452,7 +432,10 @@ export default function RainwaterSimulator() {
   const restart = useCallback(() => {
     setCurrentStep(1)
     setCurrentSubStep(1)
-    setData({ usages: [] })
+    setData({
+      usages: [],
+      financialAids: undefined,
+    })
     setNavigationHistory([])
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, [])

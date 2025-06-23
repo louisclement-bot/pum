@@ -4,9 +4,10 @@ _Last update: 2025-06-23_
 ---
 
 ## 1. Scope  
-This document analyses the **existing** product-recommendation flow (tanks & pumps) and details the **V2 rules** requested by business. It is the implementation blueprint for the upcoming refactor (`droid/product-reco-refactor`).
 
-> The JSON catalogue in **`public/data/products.json` _must remain untouched_.**  
+This document analyses the **existing** product-recommendation flow (tanks & pumps) and details the **V2 rules** requested by business. It is the implementation blueprint for the upcoming refactor `droid/product-reco-refactor`.
+
+> The JSON catalogue in `public/data/products.json` **must remain untouched**.  
 > All logic changes happen in TypeScript only.
 
 ---
@@ -17,15 +18,17 @@ This document analyses the **existing** product-recommendation flow (tanks & pum
 
 | Helper | Responsibility |
 |--------|----------------|
-| `fetchProducts()` | Load catalogue (API > static) & memoise. |
+| `fetchProducts()` | Load catalogue (API → static) & memoise. |
 | `sortByPriority()` | Secondary ordering: `display_priority` → volume. |
 | `getRecommendedTanks(recommendedSize, usages, limit = 3)` | Returns **≤3** tanks mixing aerial & buried depending on indoor usage. Size logic uses “ideal/acceptable/fallback” ranges. Ratio: 2 buried + 1 aerial (if indoor) or 1 buried + 2 aerial (garden-only). |
-| `getAdditionalRecommendedTanks(recommendedSize, usages, topProducts)` | Adds up to 9 extra tanks. Distribution:<br>• Mixed = 6 buried + 3 aerial<br>• Indoor-only = 9 buried<br>• Garden-only = 5 aerial + 4 buried |
+| `getAdditionalRecommendedTanks(recommendedSize, usages, topProducts)` | Adds up to 9 extra tanks.<br>• Mixed = 6 buried + 3 aerial<br>• Indoor-only = 9 buried<br>• Garden-only = 5 aerial + 4 buried |
 | `getCompatiblePumps(usages, recommendedTanks?)` | Heuristic string matching & volume compatibility arrays. Returns ≤ 2 pumps. |
 | UI helpers | `isBestsellerProduct()`, `getProductFeatures()` (visual only). |
 
 ### 2.2 UI consumer  
-`components/steps/recommended-products.tsx`  
+
+`components/steps/recommended-products.tsx`
+
 1. Calls helpers inside a `useEffect` to compute **top-3**, **additional 9**, **pumps**.  
 2. Displays **top-3** by default with “Voir plus” to reveal the rest.  
 3. Pump section shows up to 3 cards (helpers supply max 2).
@@ -46,13 +49,13 @@ This document analyses the **existing** product-recommendation flow (tanks & pum
 ## 3. V2 – Target Rules
 
 ### 3.1 Tank-selection logic
-1. **Indoor present** (`toilet` _or_ `washing`): **only buried tanks**.  
-2. **Garden-only**: aim for **3 results** → 2 aerial + 1 buried. The buried one is included **only if** a buried capacity ≥ need exists; otherwise just return the 2 aerial tanks.  
+
+1. **Indoor present** (`toilet` *or* `washing`): **only buried tanks**.  
+2. **Garden-only**: aim for **3 results** → 2 aerial + 1 buried. The buried one is included **only if** a buried capacity ≥ need exists, otherwise return just the 3 aerial.  
 3. **Top-3** = tanks with capacities **closest to, but not below,** `roundedNeed`; distance primary, `display_priority` tie-breaker.  
-4. **Next-6**: continue selecting from the remaining eligible candidates (respecting indoor-vs-garden type eligibility) sorted by the same proximity logic. **No fixed aerial/buried ratio is enforced for these six items.**
+4. **Next-6**: continue the same filter and ordering until **max 9** total.
 
 ### 3.2 Capacity rounding
-Pre-define once in module:
 
 ```ts
 const AERIAL_CAPS = [400, 700, 1000, 3000, 5000, 10000];
@@ -62,13 +65,15 @@ const BURIED_CAPS = [3000, 5000, 8000, 10000, 20000];
 `roundUpToNearestCap(need, typeList)` returns the **smallest capacity ≥ need** from the list; if none exists (need > largest), keep `need` (existing fallback).
 
 ### 3.3 Pump rules
+
 | Usage combination | Pumps to return (max 2) |
 |-------------------|-------------------------|
 | Garden-only | `KIT POMPE POUR CUVE AERIENNE REEMPLOI EXTERIEUR`,<br>`KIT POMPE POUR REEMPLOI EXTERIEUR` |
 | ≥ 1 Indoor usage | `KIT POMPE POUR REEMPLOI EXTERIEUR/INTERIEUR` |
-| Indoor-only | _same as previous line_ |
+| Indoor-only | *same as previous line* |
 
 ### 3.4 Display ordering
+
 1. Distance to `roundedNeed` (ascending).  
 2. `display_priority` (ascending).  
 3. Volume (ascending) as final tie-breaker (implicit in helper).
@@ -78,6 +83,7 @@ const BURIED_CAPS = [3000, 5000, 8000, 10000, 20000];
 ## 4. Implementation Plan
 
 ### 4.1 Branch
+
 ```bash
 git checkout -b droid/product-reco-refactor
 ```
@@ -86,33 +92,36 @@ git checkout -b droid/product-reco-refactor
 
 | File | Action |
 |------|--------|
-| `lib/productService.ts` | • Add `roundUpToNearestCap()` util.<br>• Re-write `getRecommendedTanks` per §3.1/3.2.<br>• Re-write `getAdditionalRecommendedTanks` so it simply filters by eligibility and orders by proximity for the additional items (no aerial/buried quota).<br>• Replace `getCompatiblePumps` with literal filter per §3.3.<br>• Remove obsolete “ideal/acceptable” logic. |
+| `lib/productService.ts` | • Add `roundUpToNearestCap()` util.<br>• Re-write `getRecommendedTanks` per §3.1/3.2.<br>• Re-write `getAdditionalRecommendedTanks` to respect new ratios & ordering.<br>• Replace `getCompatiblePumps` with literal filter per §3.3.<br>• Remove obsolete “ideal/acceptable” logic. |
 | `components/steps/recommended-products.tsx` | No interface change; ensure UI copes if only **1** pump returned. |
 | `docs/VOLUME_ANALYSIS_CORRECTION.md` | Update rounding explanation. |
-| `docs/PRODUCT_RECOMMENDATION_ALGO_V2.md` | _this file_. |
+| `docs/PRODUCT_RECOMMENDATION_ALGO_V2.md` | *this file*. |
 | `__tests__/productService.test.ts` | Unit tests covering every rule in §3. |
 
 ### 4.3 Migration & Backwards Compatibility
-- **Catalogue untouched** → SSR CORS/cache unchanged.  
-- UI already guards against empty arrays. Minor CSS/layout unaffected.
+
+* **Catalogue untouched** → SSR CORS/cache unchanged.  
+* UI already guards against empty arrays. Minor CSS/layout unaffected.
 
 ### 4.4 Risks & Mitigations
 
 | Risk | Mitigation |
 |------|------------|
+| Inventory lacks capacity for required ratio | After ratio pass, back-fill with any eligible tanks ≥ need. |
 | Literal pump names missing in catalogue | Fallback to old heuristic if literal search yields 0. |
 | Performance hits from extra sorting | Dataset ≤ 100 rows; negligible. Use cached arrays per call. |
 
 ---
 
 ## 5. Next-Steps Checklist
+
 - [ ] Create `droid/product-reco-refactor` branch.  
 - [ ] Commit this spec & doc updates.  
 - [ ] Implement utilities & refactor helpers (TDD).  
 - [ ] Add Jest tests; run `pnpm test`.  
 - [ ] Manual QA via simulator (`pnpm dev`) with scenarios:  
-  1. **Garden-only**, need = 850 L → should return two aerial tanks (700 L & 1000 L). No buried if none ≥ need. Pumps = two garden kits.  
-  2. **Toilet + Garden**, need = 4200 L → top-3 buried tanks (5000 L, 8000 L, 10000 L). Pumps = interior/exterior kit.  
+  1. Garden-only, need = 850 L → 1000 L aerial + 700 L aerial (no buried returned). Pumps = 2 garden kits.  
+  2. Toilet + Garden, need = 4200 L → 5000 L, 8000 L, 10000 L buried. Pumps = indoor/exterior kit.  
 - [ ] Open PR, include changelog & migration note.
 
 ---

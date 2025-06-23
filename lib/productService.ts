@@ -23,16 +23,40 @@ export async function fetchProducts(): Promise<Product[]> {
   }
 
   try {
-    const response = await fetch("/data/products.json")
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.status}`)
+    /**
+     * 1️⃣  Primary source : JSON served by Next API route.
+     * This prevents “HTML instead of JSON” errors caused by static-file
+     * routing issues in some deployments.
+     */
+    const primaryResponse = await fetch("/api/products")
+
+    // Ensure we received a successful status *and* JSON content
+    if (!primaryResponse.ok) {
+      throw new Error(`Failed to fetch products from API: ${primaryResponse.status}`)
     }
-    const products: Product[] = await response.json()
+    const contentType = primaryResponse.headers.get("content-type") || ""
+    if (!contentType.includes("application/json")) {
+      throw new Error(`Invalid content-type for products API: ${contentType}`)
+    }
+
+    const products: Product[] = await primaryResponse.json()
     productsCache = products
     return products
   } catch (error) {
-    console.error("Error fetching products:", error)
-    return []
+    // Log and attempt fallback to legacy static file, then to empty list
+    console.error("[productService] Primary fetch failed:", error)
+    try {
+      const fallbackResponse = await fetch("/data/products.json")
+      if (!fallbackResponse.ok) {
+        throw new Error(`Fallback fetch failed: ${fallbackResponse.status}`)
+      }
+      const products: Product[] = await fallbackResponse.json()
+      productsCache = products
+      return products
+    } catch (fallbackError) {
+      console.error("[productService] Fallback fetch failed:", fallbackError)
+      return [] // final graceful degradation
+    }
   }
 }
 

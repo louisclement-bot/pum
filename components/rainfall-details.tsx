@@ -217,7 +217,6 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
               </TabsTrigger>
             </TabsList>
 
-            <div className="grid grid-cols-1 grid-rows-1 w-full">
               <TabsContent value="monthly" className="mt-4">
                 <MonthlyRainfallChart data={rainfallData.monthlyData} />
               </TabsContent>
@@ -230,7 +229,6 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
               <TabsContent value="table" className="mt-4">
                 <RainfallDataTable data={rainfallData.monthlyData} />
               </TabsContent>
-            </div>
           </Tabs>
 
           <div className="text-xs text-slate-500 dark:text-slate-400 italic mt-4">

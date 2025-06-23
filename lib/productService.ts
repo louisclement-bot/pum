@@ -8,6 +8,23 @@ export interface Product {
   compatibleWithBuriedVolumes: number[] | null
   productUrl: string
   imageUrl: string
+
+  /**
+   * Priority for display in recommendation lists
+   * Lower number = higher priority (e.g. 1 shows first)
+   */
+  display_priority?: number
+
+  /**
+   * Marketing / technical advantages displayed in UI
+   */
+  advantages?: string[]
+
+  /**
+   * Volumes (in L) of aerial tanks this product is compatible with.
+   * Mainly used for pumps. `null` or empty array means "all".
+   */
+  compatibleWithAerialVolumes?: number[] | null
 }
 
 // Cache for products to avoid multiple fetches
@@ -25,7 +42,7 @@ export async function fetchProducts(): Promise<Product[]> {
   try {
     /**
      * 1️⃣  Primary source : JSON served by Next API route.
-     * This prevents “HTML instead of JSON” errors caused by static-file
+     * This prevents "HTML instead of JSON" errors caused by static-file
      * routing issues in some deployments.
      */
     const primaryResponse = await fetch("/api/products")
@@ -61,8 +78,27 @@ export async function fetchProducts(): Promise<Product[]> {
 }
 
 /**
+ * Sort products by display_priority (lower number = higher priority)
+ * If display_priority is not available or equal, sort by volume
+ */
+function sortByPriority(products: Product[]): Product[] {
+  return [...products].sort((a, b) => {
+    // First sort by display_priority if available
+    if (a.display_priority !== undefined && b.display_priority !== undefined) {
+      return a.display_priority - b.display_priority;
+    }
+    // If only one has display_priority, prioritize it
+    if (a.display_priority !== undefined) return -1;
+    if (b.display_priority !== undefined) return 1;
+    
+    // Otherwise sort by volume (for tanks)
+    return (a.volume || 0) - (b.volume || 0);
+  });
+}
+
+/**
  * Gets recommended tanks based on the calculated size and usage
- * Provides a mix of aerial and buried tanks
+ * Provides a mix of aerial and buried tanks sorted by priority
  * @param recommendedSize The recommended tank size in liters
  * @param usages Array of usage types (garden, toilet, washing)
  * @param limit Maximum number of tanks to return
@@ -79,14 +115,15 @@ export async function getRecommendedTanks(recommendedSize: number, usages: strin
   const idealMaxSize = recommendedSize * 1.5
   const acceptableMaxSize = recommendedSize * 3
 
-  // Filter and sort tanks by size ranges
+  // Filter tanks by size ranges and sort by priority
   const getFilteredTanksByRange = (tanks: Product[], minSize: number, maxSize: number | null) => {
-    return tanks
-      .filter((tank) => {
-        const volume = tank.volume || 0
-        return volume >= minSize && (maxSize === null || volume <= maxSize)
-      })
-      .sort((a, b) => (a.volume || 0) - (b.volume || 0)) // Sort by ascending volume
+    const filteredTanks = tanks.filter((tank) => {
+      const volume = tank.volume || 0
+      return volume >= minSize && (maxSize === null || volume <= maxSize)
+    });
+    
+    // Sort by display_priority first, then by volume
+    return sortByPriority(filteredTanks);
   }
 
   // Get tanks in different size ranges
@@ -130,9 +167,8 @@ export async function getRecommendedTanks(recommendedSize: number, usages: strin
 
   // If we don't have enough tanks, try to fill with any available tanks that meet the minimum size
   if (selectedTanks.length < limit) {
-    const allValidTanks = [...fallbackBuriedTanks, ...fallbackAerialTanks]
-      .filter((tank) => !selectedTanks.includes(tank))
-      .sort((a, b) => (a.volume || 0) - (b.volume || 0))
+    const allValidTanks = sortByPriority([...fallbackBuriedTanks, ...fallbackAerialTanks]
+      .filter((tank) => !selectedTanks.includes(tank)));
 
     selectedTanks = [...selectedTanks, ...allValidTanks.slice(0, limit - selectedTanks.length)]
   }
@@ -152,40 +188,104 @@ export async function getAllTanks(recommendedSize: number): Promise<Product[]> {
   const tanks = products
     .filter(
       (product) => (product.type === "aerial" || product.type === "buried") && (product.volume || 0) >= recommendedSize,
-    )
-    .sort((a, b) => (a.volume || 0) - (b.volume || 0)) // Sort by ascending volume
-
-  return tanks
+    );
+    
+  // Sort by display_priority first, then by volume
+  return sortByPriority(tanks);
 }
 
 /**
- * Gets compatible pumps based on usage
+ * Gets compatible pumps based on usage and tank type
  * @param usages Array of usage types (garden, toilet, washing)
+ * @param recommendedTanks Array of recommended tanks
  */
-export async function getCompatiblePumps(usages: string[]): Promise<Product[]> {
-  const products = await fetchProducts()
-  const pumps = products.filter((product) => product.type === "pump")
-  const result: Product[] = []
-
-  // For garden usage, add KIT'O JARDIN
-  if (usages.includes("garden")) {
-    const gardenPump = pumps.find((pump) => pump.id === "78290") // KIT'O JARDIN
-    if (gardenPump) result.push(gardenPump)
+export async function getCompatiblePumps(usages: string[], recommendedTanks?: Product[]): Promise<Product[]> {
+  const products = await fetchProducts();
+  const pumps = products.filter((product) => product.type === "pump");
+  
+  // Determine if interior usage is needed
+  const hasInteriorUsage = usages.includes("toilet") || usages.includes("washing");
+  
+  // Determine if garden usage is needed
+  const hasGardenUsage = usages.includes("garden");
+  
+  // Determine the primary tank type (aerial or buried)
+  let primaryTankType: "aerial" | "buried" | null = null;
+  let recommendedTankVolumes: number[] = [];
+  
+  if (recommendedTanks && recommendedTanks.length > 0) {
+    // Count tank types to determine primary type
+    const tankTypeCounts = recommendedTanks.reduce(
+      (counts, tank) => {
+        if (tank.type === "aerial") counts.aerial += 1;
+        if (tank.type === "buried") counts.buried += 1;
+        if (tank.volume) recommendedTankVolumes.push(tank.volume);
+        return counts;
+      },
+      { aerial: 0, buried: 0 }
+    );
+    
+    // Determine primary tank type
+    primaryTankType = tankTypeCounts.aerial > tankTypeCounts.buried ? "aerial" : "buried";
   }
-
-  // For toilet or washing usage, add KIT'O HABITAT
-  if (usages.includes("toilet") || usages.includes("washing")) {
-    const interiorPump = pumps.find((pump) => pump.id === "78291") // KIT'O HABITAT
-    if (interiorPump) result.push(interiorPump)
+  
+  // Filter pumps based on the usage and tank type criteria
+  const filteredPumps = pumps.filter(pump => {
+    // If interior usage is needed, select the interior/exterior pump
+    if (hasInteriorUsage) {
+      return pump.name.includes("EXTERIEUR/INTERIEUR");
+    }
+    
+    // If only garden usage and we have a primary tank type
+    if (hasGardenUsage && primaryTankType) {
+      if (primaryTankType === "aerial") {
+        // For aerial tanks, use the aerial pump
+        return pump.name.includes("CUVE AERIENNE") && pump.name.includes("EXTERIEUR");
+      } else {
+        // For buried tanks, use the standard exterior pump
+        return !pump.name.includes("CUVE AERIENNE") && pump.name.includes("EXTERIEUR") && 
+               !pump.name.includes("INTERIEUR");
+      }
+    }
+    
+    // Default case: include all pumps
+    return true;
+  });
+  
+  // Filter pumps by compatibility with recommended tank volumes
+  const compatiblePumps = filteredPumps.filter(pump => {
+    // If no tank volumes, consider all pumps compatible
+    if (recommendedTankVolumes.length === 0) return true;
+    
+    // Check if pump is compatible with any of the recommended tank volumes
+    if (primaryTankType === "aerial" && pump.compatibleWithAerialVolumes) {
+      // For aerial tanks, check compatibleWithAerialVolumes
+      return pump.compatibleWithAerialVolumes.length === 0 || // Empty array means compatible with all
+             recommendedTankVolumes.some(volume => 
+               pump.compatibleWithAerialVolumes?.includes(volume)
+             );
+    } else if (primaryTankType === "buried" && pump.compatibleWithBuriedVolumes) {
+      // For buried tanks, check compatibleWithBuriedVolumes
+      return pump.compatibleWithBuriedVolumes.length === 0 || // Empty array means compatible with all
+             recommendedTankVolumes.some(volume => 
+               pump.compatibleWithBuriedVolumes?.includes(volume)
+             );
+    }
+    
+    // If no compatibility info, consider it compatible
+    return true;
+  });
+  
+  // Sort by display_priority
+  const sortedPumps = sortByPriority(compatiblePumps);
+  
+  // If no compatible pumps found, return any pumps
+  if (sortedPumps.length === 0 && pumps.length > 0) {
+    return sortByPriority(pumps).slice(0, 2);
   }
-
-  // If no specific usages or no pumps found, add a default pump
-  if (result.length === 0 && pumps.length > 0) {
-    result.push(pumps[0])
-  }
-
+  
   // Limit to 2 pumps maximum
-  return result.slice(0, 2)
+  return sortedPumps.slice(0, 2);
 }
 
 /**
@@ -211,20 +311,27 @@ export function isBestsellerProduct(product: Product, recommendedSize: number, u
     }
   }
 
-  // For pumps, check if it matches the primary usage
+  // For pumps, check if it matches the usage pattern
   if (product.type === "pump") {
-    // KIT'O HABITAT is bestseller for toilet/washing
-    if (product.id === "78291" && (usages.includes("toilet") || usages.includes("washing"))) {
-      return true
+    const hasInteriorUsage = usages.includes("toilet") || usages.includes("washing");
+    const hasGardenOnly = usages.includes("garden") && !hasInteriorUsage;
+    
+    // Interior/Exterior pump is bestseller for toilet/washing
+    if (product.name.includes("EXTERIEUR/INTERIEUR") && hasInteriorUsage) {
+      return true;
     }
-    // KIT'O JARDIN is bestseller for garden-only usage
-    if (
-      product.id === "78290" &&
-      usages.includes("garden") &&
-      !usages.includes("toilet") &&
-      !usages.includes("washing")
-    ) {
-      return true
+    
+    // Aerial pump is bestseller for garden-only with aerial tanks
+    if (product.name.includes("CUVE AERIENNE") && hasGardenOnly) {
+      return true;
+    }
+    
+    // Standard exterior pump is bestseller for garden-only with buried tanks
+    if (!product.name.includes("CUVE AERIENNE") && 
+        product.name.includes("EXTERIEUR") && 
+        !product.name.includes("INTERIEUR") && 
+        hasGardenOnly) {
+      return true;
     }
   }
 
@@ -236,6 +343,12 @@ export function isBestsellerProduct(product: Product, recommendedSize: number, u
  * @param product The product
  */
 export function getProductFeatures(product: Product): string[] {
+  // If the product has defined advantages, use them
+  if (product.advantages && product.advantages.length > 0) {
+    return product.advantages;
+  }
+  
+  // Otherwise use the legacy feature generation logic
   const features: string[] = []
 
   if (product.type === "aerial") {
@@ -268,16 +381,21 @@ export function getProductFeatures(product: Product): string[] {
   }
 
   if (product.type === "pump") {
-    if (product.id === "78291") {
+    if (product.name.includes("EXTERIEUR/INTERIEUR")) {
       features.push("Pour WC et lave-linge")
       features.push("Installation intérieure")
       features.push("Silencieux")
     }
 
-    if (product.id === "78290") {
+    if (product.name.includes("EXTERIEUR") && !product.name.includes("INTERIEUR")) {
       features.push("Idéal pour l'arrosage")
       features.push("Facile à installer")
       features.push("Basse consommation")
+    }
+    
+    if (product.name.includes("CUVE AERIENNE")) {
+      features.push("Kit complet pour cuve aérienne")
+      features.push("Pompe de surface")
     }
   }
 

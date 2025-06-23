@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import { useChartVisibility } from "../../hooks/use-chart-visibility"
 
 interface MonthlyRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -15,6 +16,9 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // Helps with SSR / hydration issues
+
+  // detect visibility & size changes of the chart container
+  const { ref, updateTrigger } = useChartVisibility()
 
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
@@ -48,7 +52,7 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
       maxValue: max,
       firstItem: formattedData[0],
     })
-  }, [data])
+  }, [data, updateTrigger]) // re-compute when container gets resized / becomes visible
 
   /*
    * No extra visibility hack needed: parent <TabsContent forceMount>
@@ -66,7 +70,7 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
   }
 
   return (
-    <div className={`w-full h-[300px] ${className}`}>
+    <div ref={ref} className={`w-full h-[300px] ${className}`}>
       {!mounted ? (
         // Only check for mounted status, not visibility
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
@@ -74,7 +78,12 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
         </div>
       ) : (
         <>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            /* key forces Recharts to remount & measure again on visibility change */
+            key={updateTrigger}
+          >
           <BarChart
             data={chartData}
             margin={{

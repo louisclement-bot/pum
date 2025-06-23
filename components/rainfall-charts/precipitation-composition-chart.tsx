@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+// Use relative path to avoid alias resolution issues in certain build environments
+import { useChartVisibility } from "../../hooks/use-chart-visibility"
 
 interface PrecipitationCompositionChartProps {
   rain: number
@@ -20,6 +22,8 @@ export default function PrecipitationCompositionChart({
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
+  // Observe when the chart becomes visible / resizes
+  const { ref, updateTrigger } = useChartVisibility()
 
   // mark as mounted on client to avoid rendering recharts during SSR
   useEffect(() => {
@@ -40,7 +44,7 @@ export default function PrecipitationCompositionChart({
       { name: "Pluie", value: rainValue },
       { name: "Neige", value: snowValue },
     ])
-  }, [rain, snow])
+  }, [rain, snow, updateTrigger])
 
   const COLORS = isDark ? ["#3b82f6", "#94a3b8"] : ["#60a5fa", "#cbd5e1"]
 
@@ -54,7 +58,7 @@ export default function PrecipitationCompositionChart({
   }
 
   return (
-    <div className={`w-full h-[300px] relative ${className}`}>
+    <div ref={ref} className={`w-full h-[300px] relative ${className}`}>
       {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
@@ -63,6 +67,8 @@ export default function PrecipitationCompositionChart({
           <ResponsiveContainer
             width="100%"
             height="100%"
+            /* key forces ResponsiveContainer to remount when size/visibility changes */
+            key={updateTrigger}
             debounce={50}
           >
         <PieChart>

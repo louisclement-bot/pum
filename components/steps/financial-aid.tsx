@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState, useEffect } from "react"
-import { Euro, Building, MapPin, Info, Edit3, ChevronDown, ChevronUp, ExternalLink, Mail, Phone, FileText, Home } from "lucide-react"
+import { Euro, Building, MapPin, Info, Edit3, ExternalLink, Mail, Phone, FileText, Home } from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
@@ -147,15 +147,6 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                 <div className="border-l-4 border-[#1D40AF] dark:border-blue-500 p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-bold text-xl text-[#1D40AF] dark:text-blue-300">{aid.name}</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleExpand(aid.id)}
-                      className="text-blue-600 dark:text-blue-400 p-1 h-auto"
-                      aria-label={expandedAids[aid.id] ? "Réduire les détails" : "Voir plus de détails"}
-                    >
-                      {expandedAids[aid.id] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                    </Button>
                   </div>
                   
                   {/* Basic information - always visible */}
@@ -181,6 +172,18 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                       </div>
                       <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
                     </div>
+                  </div>
+                  
+                  {/* Toggle details button */}
+                  <div className="mt-4">
+                    <Button
+                      onClick={() => toggleExpand(aid.id)}
+                      variant="outline"
+                      className="border-blue-200 dark:border-blue-700 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                      aria-expanded={expandedAids[aid.id] ? "true" : "false"}
+                    >
+                      {expandedAids[aid.id] ? "Voir moins" : "Voir plus"}
+                    </Button>
                   </div>
                   
                   {/* Expanded information - visible only when expanded */}

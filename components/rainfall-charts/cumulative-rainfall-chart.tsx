@@ -16,7 +16,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // SSR / hydration helper
   // Manage visibility & resize (important when chart is inside tabs)
-  const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility()
+  const { ref: containerRef, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -62,7 +62,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
 
   return (
     <div ref={containerRef} className={`w-full h-[300px] ${className}`}>
-      {!(mounted && isVisible) ? (
+      {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>

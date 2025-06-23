@@ -18,7 +18,7 @@ export default function PrecipitationCompositionChart({
 }: PrecipitationCompositionChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
-  const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility()
+  const { ref: containerRef, updateTrigger } = useChartVisibility()
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -57,7 +57,7 @@ export default function PrecipitationCompositionChart({
 
   return (
     <div ref={containerRef} className={`w-full h-[300px] relative ${className}`}>
-      {!(mounted && isVisible) ? (
+      {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>

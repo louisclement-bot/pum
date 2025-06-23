@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
@@ -16,8 +17,8 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
   const [maxValue, setMaxValue] = useState<number>(0)
   const [mounted, setMounted] = useState(false) // Helps with SSR / hydration issues
 
-  // Visibility / resize helper (for tabs & responsive needs)
-  const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility()
+  // Ref for Recharts container & a trigger to force recalculation on resize
+  const { ref: containerRef, updateTrigger } = useChartVisibility()
 
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
@@ -53,6 +54,12 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
     })
   }, [data])
 
+  /*
+   * No extra visibility hack needed: parent <TabsContent forceMount>
+   * keeps the panel in the DOM; Recharts re-measures automatically
+   * thanks to ResizeObserver inside useChartVisibility (updateTrigger).
+   */
+
   // If no data, don't render
   if (!chartData || chartData.length === 0) {
     return (
@@ -64,8 +71,8 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
 
   return (
     <div ref={containerRef} className={`w-full h-[300px] ${className}`}>
-      {!(mounted && isVisible) ? (
-        // Debug placeholder – lets us know component hydrated
+      {!mounted ? (
+        // Only check for mounted status, not visibility
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
           Initialising chart…
         </div>

@@ -13,10 +13,16 @@ interface MonthlyRainfallChartProps {
 export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRainfallChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
+  const [mounted, setMounted] = useState(false) // Helps with SSR / hydration issues
   const chartRef = useRef<HTMLDivElement>(null)
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
+
+  // mark mounted once we hit the client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Process data when it changes
   useEffect(() => {
@@ -39,6 +45,7 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
     console.log("Monthly rainfall chart data processed:", {
       dataPoints: formattedData.length,
       maxValue: max,
+      firstItem: formattedData[0],
     })
   }, [data])
 
@@ -53,7 +60,13 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
 
   return (
     <div ref={chartRef} className={`w-full h-[300px] ${className}`}>
-      <ResponsiveContainer width="100%" height="100%">
+      {!mounted ? (
+        // Debug placeholder – lets us know component hydrated
+        <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
+          Initialising chart…
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={chartData}
           margin={{
@@ -117,7 +130,8 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
             isAnimationActive={true}
           />
         </BarChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      )}
     </div>
   )
 }

@@ -16,10 +16,16 @@ export default function PrecipitationCompositionChart({
   className = "",
 }: PrecipitationCompositionChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
+  const [mounted, setMounted] = useState(false) // helps avoid SSR/hydration glitches
   const chartRef = useRef<HTMLDivElement>(null)
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
+
+  // mark as mounted on client to avoid rendering recharts during SSR
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Process data when it changes
   useEffect(() => {
@@ -59,7 +65,12 @@ export default function PrecipitationCompositionChart({
 
   return (
     <div ref={chartRef} className={`w-full h-[300px] ${className}`}>
-      <ResponsiveContainer width="100%" height="100%">
+      {!mounted ? (
+        <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
+          Initialising chart…
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={chartData}
@@ -106,6 +117,7 @@ export default function PrecipitationCompositionChart({
           />
         </PieChart>
       </ResponsiveContainer>
+      )}
     </div>
   )
 }

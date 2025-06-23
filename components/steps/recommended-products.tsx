@@ -65,8 +65,9 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
         const allTankOptions = await getAllTanks(data.recommendedTankSize || 0)
         setAllTanks(allTankOptions)
 
-        // Get compatible pumps based on usage
-        const pumps = await getCompatiblePumps(data.usages || [])
+        // Get compatible pumps based on usage AND recommended tanks
+        // Pass the tanks to getCompatiblePumps for better pump recommendations
+        const pumps = await getCompatiblePumps(data.usages || [], tanks)
         setRecommendedPumps(pumps)
       } catch (error) {
         console.error("Error loading product recommendations:", error)

@@ -45,6 +45,10 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300",
+      // Keep inactive panels in the DOM (so children like Recharts can measure)
+      // while visually hiding them and disabling interaction.
+      // Radix applies `display:none`; we override that with block/opacity classes.
+      "data-[state=inactive]:block data-[state=inactive]:opacity-0 data-[state=inactive]:pointer-events-none",
       className,
     )}
     {...props}

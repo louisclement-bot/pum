@@ -5,9 +5,18 @@
     "type": "buried",
     "volume": 2000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      2000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63711",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "63715",
@@ -15,9 +24,18 @@
     "type": "buried",
     "volume": 7000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      7000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63715",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "63716",
@@ -25,9 +43,18 @@
     "type": "buried",
     "volume": 8000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      8000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63716",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d%27eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/P2195_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d%27eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/P2195_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "65213",
@@ -35,9 +62,18 @@
     "type": "buried",
     "volume": 20000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      20000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P2197?articleId=65213",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "65807",
@@ -45,9 +81,18 @@
     "type": "buried",
     "volume": 3000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      3000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P2196?articleId=65807",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2196_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-ECOSLIM-/1_Produit/P2196_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2196_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-ECOSLIM-/1_Produit/P2196_2.jpg",
+    "display_priority": 4,
+    "advantages": [
+      "-40% sur le coût du terrassement",
+      "Idéal pour terrain rocailleux",
+      "Jumelable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "66671",
@@ -55,9 +100,18 @@
     "type": "buried",
     "volume": 3000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      3000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-sebico/produits/P3314?articleId=66671",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png",
+    "display_priority": 1,
+    "advantages": [
+      "Filtre auto-nettoyant",
+      "Renforcée grâce à ses nervures",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "66673",
@@ -65,9 +119,18 @@
     "type": "buried",
     "volume": 5000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      5000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-sebico/produits/P3314?articleId=66673",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png",
+    "display_priority": 4,
+    "advantages": [
+      "Filtre auto-nettoyant",
+      "Renforcée grâce à ses nervures",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "66674",
@@ -75,9 +138,18 @@
     "type": "buried",
     "volume": 6000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      6000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-sebico/produits/P3314?articleId=66671",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png",
+    "display_priority": 2,
+    "advantages": [
+      "Filtre auto-nettoyant",
+      "Renforcée grâce aux nervures",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "66676",
@@ -85,9 +157,18 @@
     "type": "buried",
     "volume": 8000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      8000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-sebico/produits/P3314?articleId=66676",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png",
+    "display_priority": 3,
+    "advantages": [
+      "Filtre auto-nettoyant",
+      "Renforcée grâce à ses nervures",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "66677",
@@ -95,9 +176,18 @@
     "type": "buried",
     "volume": 10000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      10000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-sebico/produits/P3314?articleId=66677",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3314_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-PACK'EAU-/1_Produit/SEBICO-Photo-60SPK.png",
+    "display_priority": 4,
+    "advantages": [
+      "Filtre auto-nettoyant",
+      "Renforcée grâce à ses nervures",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67956",
@@ -105,9 +195,18 @@
     "type": "buried",
     "volume": 25000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      25000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67957",
@@ -115,9 +214,18 @@
     "type": "buried",
     "volume": 30000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      30000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67958",
@@ -125,9 +233,18 @@
     "type": "buried",
     "volume": 35000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      35000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67959",
@@ -135,9 +252,18 @@
     "type": "buried",
     "volume": 40000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      40000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67960",
@@ -145,9 +271,18 @@
     "type": "buried",
     "volume": 45000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      45000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67961",
@@ -155,9 +290,18 @@
     "type": "buried",
     "volume": 50000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      50000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67962",
@@ -165,9 +309,18 @@
     "type": "buried",
     "volume": 55000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      55000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "67963",
@@ -175,9 +328,18 @@
     "type": "buried",
     "volume": 60000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      60000
+    ],
     "productUrl": "https://www.mypum.fr/assainissement-eu-ep/gestion-des-eaux-pluviales/cuves-de-stockage-regulation/simple-peau/produits/P3962?articleId=67956",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P3962_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-ECOCITER-/1_Produit/ecociter%20et.JPG",
+    "display_priority": 1,
+    "advantages": [
+      "Adapté aux bâtiments collectifs",
+      "Filtre intégré",
+      "Pieds de stabilisation"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "68462",
@@ -185,9 +347,18 @@
     "type": "buried",
     "volume": 10000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      10000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=68462",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "70617",
@@ -195,9 +366,18 @@
     "type": "buried",
     "volume": 5000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      5000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=70617",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d%27eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/P2195_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d%27eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/P2195_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "70618",
@@ -205,9 +385,18 @@
     "type": "buried",
     "volume": 6000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      6000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63711",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "74467",
@@ -215,9 +404,18 @@
     "type": "aerial",
     "volume": 1000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P5155?articleId=74467",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5155_Citerne%20auto-portante%20PE%20recycl%C3%A9/1_Produit/P5155_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5155_Citerne%20auto-portante%20PE%20recycl%C3%A9/1_Produit/P5155_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "100% matière recyclée",
+      "Vanne 1/4 tour PVC intégrée",
+      "Résistante aux intempéries"
+    ],
+    "compatibleWithAerialVolumes": [
+      1000
+    ]
   },
   {
     "id": "74469",
@@ -225,9 +423,18 @@
     "type": "aerial",
     "volume": 3000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P5155?articleId=74469",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5155_Citerne%20auto-portante%20PE%20recycl%C3%A9/1_Produit/P5155_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5155_Citerne%20auto-portante%20PE%20recycl%C3%A9/1_Produit/P5155_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "100% matière recyclée",
+      "Vanne 1/4 tour PVC intégrée",
+      "Résistante aux intempéries"
+    ],
+    "compatibleWithAerialVolumes": [
+      3000
+    ]
   },
   {
     "id": "74820",
@@ -235,9 +442,18 @@
     "type": "buried",
     "volume": 5000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      5000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-plasteau/produits/P2196?articleId=74820",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2196_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-ECOSLIM-/1_Produit/P2196_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2196_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-ECOSLIM-/1_Produit/P2196_2.jpg",
+    "display_priority": 3,
+    "advantages": [
+      "Filtre intégré",
+      "Idéal pour terrain rocailleux",
+      "Jumelable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "75255",
@@ -245,9 +461,18 @@
     "type": "buried",
     "volume": 3000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      3000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-sebico/produits/P5492?articleId=75255",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "Renforcée grâce aux nervures",
+      "Jumelable",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "75256",
@@ -255,9 +480,18 @@
     "type": "buried",
     "volume": 5000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      5000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-sebico/produits/P5492?articleId=75255",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "Renforcée grâce aux nervures",
+      "Jumelable",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "75257",
@@ -265,9 +499,18 @@
     "type": "buried",
     "volume": 6000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      6000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-sebico/produits/P5492?articleId=75255",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5492_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur%20-PACK'EAU-/1_Produit/P5492_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Renforcée grâce aux nervures",
+      "Jumelable",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "77373",
@@ -275,9 +518,18 @@
     "type": "aerial",
     "volume": 10000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P5878?articleId=77373",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Pas de terrassement",
+      "Résiste aux UV",
+      "Economique"
+    ],
+    "compatibleWithAerialVolumes": [
+      10000
+    ]
   },
   {
     "id": "77374",
@@ -285,9 +537,18 @@
     "type": "aerial",
     "volume": 3000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P5878?articleId=77374",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg",
+    "display_priority": 3,
+    "advantages": [
+      "Pas de terrassement",
+      "Résiste aux UV",
+      "Economique"
+    ],
+    "compatibleWithAerialVolumes": [
+      3000
+    ]
   },
   {
     "id": "77375",
@@ -295,9 +556,18 @@
     "type": "aerial",
     "volume": 5000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P5878?articleId=77375",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P5878_Cuve%20de%20stockage%20EP%20souple%20a%C3%A9rienne/1_Produit/P5878_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Pas de terrassement",
+      "Résiste aux UV",
+      "Economique"
+    ],
+    "compatibleWithAerialVolumes": [
+      5000
+    ]
   },
   {
     "id": "78290",
@@ -325,7 +595,14 @@
       55000
     ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/relevage-des-eaux-de-pluie/pompes-immergees/produits/P6088?articleId=78290",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6088_Kit%20d'alimentation%20jardin%20pour%20cuve%20de%20r%C3%A9cup%C3%A9ration%20eau%20de%20pluie%20KIT'O%20JARDIN/1_Produit/P6088_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6088_Kit%20d'alimentation%20jardin%20pour%20cuve%20de%20r%C3%A9cup%C3%A9ration%20eau%20de%20pluie%20KIT'O%20JARDIN/1_Produit/P6088_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Kit complet pour cuve enterrée",
+      "Idéal pour l'arrosage",
+      "Pompe immergée"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78291",
@@ -353,7 +630,14 @@
       55000
     ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/relevage-des-eaux-de-pluie/pompes-immergees/produits/P6089?articleId=78291",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6089_Kit%20d'alimentation%20WC%20et%20lave-linge%20pour%20cuve%20de%20r%C3%A9cup%C3%A9ration%20eau%20de%20pluie%20KIT'O%20HABITAT/1_Produit/P6089_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6089_Kit%20d'alimentation%20WC%20et%20lave-linge%20pour%20cuve%20de%20r%C3%A9cup%C3%A9ration%20eau%20de%20pluie%20KIT'O%20HABITAT/1_Produit/P6089_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Kit complet pour cuve enterrée",
+      "Utilisation de l'eau en intérieur + arrosage",
+      "Pompe immergée"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78349",
@@ -361,9 +645,18 @@
     "type": "aerial",
     "volume": 400,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P6100?articleId=78349",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6100_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-PLUVIALUX-/1_Produit/P6100_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6100_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-PLUVIALUX-/1_Produit/P6100_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Ligne épurée",
+      "Existe en 2 coloris en gris et beige",
+      "Disponible en 400 et 700L"
+    ],
+    "compatibleWithAerialVolumes": [
+      400
+    ]
   },
   {
     "id": "78351",
@@ -371,9 +664,18 @@
     "type": "aerial",
     "volume": 700,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P6100?articleId=78351",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6100_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-PLUVIALUX-/1_Produit/P6100_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6100_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-PLUVIALUX-/1_Produit/P6100_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Ligne épurée",
+      "Existe en 2 coloris en gris et beige",
+      "Disponible en 400 et 700L"
+    ],
+    "compatibleWithAerialVolumes": [
+      700
+    ]
   },
   {
     "id": "78355",
@@ -381,9 +683,18 @@
     "type": "aerial",
     "volume": 465,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P6101?articleId=78355",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6101_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-DAMONA-/1_Produit/P6101_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6101_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20design%20-DAMONA-/1_Produit/P6101_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "Faible profondeur : 38cm",
+      "Existe en 2 coloris en gris et beige",
+      "Design original"
+    ],
+    "compatibleWithAerialVolumes": [
+      400
+    ]
   },
   {
     "id": "78361",
@@ -391,9 +702,25 @@
     "type": "aerial",
     "volume": 1000,
     "usage": "Exterior Only",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-de-surface/produits/P6094?articleId=78361",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6094_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20modulaire%20-PLUVIOBLOCK-/1_Produit/P6094_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6094_Cuve%20de%20stockage%20EP%20a%C3%A9rienne%20modulaire%20-PLUVIOBLOCK-/1_Produit/P6094_2.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Modulable à l'infini",
+      "100% personnalisable",
+      "Existe en 2 coloris : gris et beige"
+    ],
+    "compatibleWithAerialVolumes": [
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      8000,
+      10000
+    ]
   },
   {
     "id": "78372",
@@ -401,9 +728,18 @@
     "type": "buried",
     "volume": 3000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      3000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78372",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "Carrossable VL",
+      "Idéal pour terrain rocailleux",
+      "-40% sur le coût du terrassement"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78373",
@@ -411,9 +747,18 @@
     "type": "buried",
     "volume": 5000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      5000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78373",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg",
+    "display_priority": 4,
+    "advantages": [
+      "Carrossable VL",
+      "Idéal pour terrain rocailleux",
+      "-40% sur le coût du terrassement"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78374",
@@ -421,9 +766,18 @@
     "type": "buried",
     "volume": 8000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      8000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-eaux-de-pluie/cuve-de-stockage-pe/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78374",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/P6102_2.jpg",
+    "display_priority": 2,
+    "advantages": [
+      "Carrossable VL",
+      "Idéal pour terrain rocailleux",
+      "-40% sur le coût du terrassement"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78375",
@@ -431,9 +785,18 @@
     "type": "buried",
     "volume": 10000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      10000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78372",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_10000_adapterdom_asm%20COTE.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_10000_adapterdom_asm%20COTE.png",
+    "display_priority": 2,
+    "advantages": [
+      "Carrossable VL",
+      "Filtre intégré",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78967",
@@ -441,9 +804,18 @@
     "type": "buried",
     "volume": 3000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      3000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63711",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 4,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "78968",
@@ -451,9 +823,18 @@
     "type": "buried",
     "volume": 4000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      4000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-plasteau/produits/P2195?articleId=63711",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P2195_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20int%C3%A9rieur-ext%C3%A9rieur%20-ECOCITER-/1_Produit/70617PUM%20TURQUOISE%20-%20ETY05000.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Faible poids, manutention facile",
+      "Filtre intégré",
+      "100% Recyclable"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "79293",
@@ -461,9 +842,18 @@
     "type": "buried",
     "volume": 15000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      15000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78372",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_10000_adapterdom_asm%20COTE.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_10000_adapterdom_asm%20COTE.png",
+    "display_priority": 1,
+    "advantages": [
+      "Carrossable VL",
+      "Filtre intégré",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "79294",
@@ -471,9 +861,18 @@
     "type": "buried",
     "volume": 20000,
     "usage": "Interior/Exterior",
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [
+      20000
+    ],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/cuves-pour-un-usage-exterieur/cuve-de-stockage-a-enterrer-biorock/produits/P6102?articleId=78372",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_15000_adapterdom_asm%20COTE.png"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/P6102_Cuve%20de%20r%C3%A9cup%C3%A9ration%20d'eau%20de%20pluie%20usage%20ext%C3%A9rieur-int%C3%A9rieur%20-FINO-/1_Produit/platin_15000_adapterdom_asm%20COTE.png",
+    "display_priority": 2,
+    "advantages": [
+      "Carrossable VL",
+      "Filtre intégré",
+      "Monobloc"
+    ],
+    "compatibleWithAerialVolumes": []
   },
   {
     "id": "79704",
@@ -481,8 +880,24 @@
     "type": "pump",
     "volume": null,
     "usage": null,
-    "compatibleWithBuriedVolumes": null,
+    "compatibleWithBuriedVolumes": [],
     "productUrl": "https://www.mypum.fr/amenagement-exterieur/stockage-et-reemploi-des-eaux-de-pluie/relevage-des-eaux-de-pluie/pompes-immergees/produits/P6301?articleId=79704",
-    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/JETLY-Photo-KITO%20Cuve%20souple.jpg"
+    "imageUrl": "https://static.mypum.fr/DAM/public/var/assets/Produits/Images%20produits/JETLY-Photo-KITO%20Cuve%20souple.jpg",
+    "display_priority": 1,
+    "advantages": [
+      "Kit complet pour cuve aérienne",
+      "Idéal pour l'arrosage",
+      "Pompe de surface"
+    ],
+    "compatibleWithAerialVolumes": [
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      8000,
+      10000
+    ]
   }
 ]

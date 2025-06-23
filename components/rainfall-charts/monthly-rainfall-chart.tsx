@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
-import { useChartVisibility } from "@/hooks/use-chart-visibility"
+import { useChartVisibility } from "../../hooks/use-chart-visibility"
 
 interface MonthlyRainfallChartProps {
   data: MonthlyPrecipitationData[]

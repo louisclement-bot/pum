@@ -3,7 +3,8 @@ import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
-import { useChartVisibility } from "@/hooks/use-chart-visibility"
+// Use relative path to avoid alias resolution issues in certain build environments
+import { useChartVisibility } from "../../hooks/use-chart-visibility"
 
 interface PrecipitationCompositionChartProps {
   rain: number

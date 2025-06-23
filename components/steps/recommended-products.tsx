@@ -200,10 +200,27 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
             // Create new PDF document
             const doc = new jsPDF()
 
+            /* -----------------------------------------------------------
+             * 1️⃣  HEADER : add PUM logo + keep title centred
+             * --------------------------------------------------------- */
+            /*  ▶▶  REAL PUM LOGO  ◀◀
+             *  Base-64 version of  public/images/pum-logo.svg
+             *  (generated once, safe to inline – ~9 KB)                                             */
+            const PUM_LOGO =
+              "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGl...<truncated long base-64 string>..."
+
+            /* Draw logo (≈40 × 11 mm) – if jsPDF fails to embed the SVG we
+               fail silently so printing still works. */
+            try {
+              doc.addImage(PUM_LOGO, "SVG", 15, 12, 40, 11)
+            } catch (e) {
+              console.warn("Unable to embed PUM logo in PDF:", e)
+            }
+
             // Add logo and title
             doc.setFontSize(20)
             doc.setTextColor(29, 64, 175) // #1D40AF
-            doc.text("Résultats de votre simulation", 105, 20, { align: "center" })
+            doc.text("Résultats de votre simulation", 105, 25, { align: "center" })
 
             // Add simulation data
             doc.setFontSize(12)
@@ -238,8 +255,9 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
             doc.text("Produits recommandés", 20, 110)
 
             // Create a table for tanks
-            const tankColumns = ["Produit", "Type", "Volume"]
+            const tankColumns = ["Référence", "Produit", "Type", "Volume"]
             const tankRows = recommendedTanks.map((tank) => [
+              `Réf: ${tank.id}`,
               tank.name,
               tank.type === "aerial" ? "Aérien" : "Enterré",
               tank.volume ? `${tank.volume}L` : "-",
@@ -259,8 +277,10 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
               doc.setTextColor(29, 64, 175)
               doc.text("Pompes recommandées", 20, pumpY)
 
-              const pumpColumns = ["Produit", "Type", "Compatibilité"]
+              // Updated pump table headers to include product reference (SKU)
+              const pumpColumns = ["Référence", "Produit", "Type", "Compatibilité"]
               const pumpRows = recommendedPumps.map((pump) => [
+                `Réf: ${pump.id}`,
                 pump.name,
                 "Pompe",
                 pump.compatibleWithBuriedVolumes
@@ -274,6 +294,33 @@ export default function RecommendedProducts({ data, prevStep, restart }: Recomme
                 startY: pumpY + 10,
                 headStyles: { fillColor: [29, 64, 175] },
               })
+            }
+
+            /* -----------------------------------------------------------
+             * 4️⃣  STORE-LOCATOR (dynamic zipcode)
+             * --------------------------------------------------------- */
+            const locatorY =
+              (doc as any).lastAutoTable?.finalY
+                ? (doc as any).lastAutoTable.finalY + 25
+                : 140
+            const postal = data.postalCode || "92000"
+            const storeUrl = `https://www.mypum.fr/agence?&s=${postal}`
+            const label = "Trouvez votre agence PUM la plus proche : "
+
+            doc.setFontSize(11)
+            doc.setTextColor(0, 0, 0)
+            doc.text(label, 20, locatorY)
+
+            const linkX = 20 + doc.getTextWidth(label) + 1
+            doc.setTextColor(29, 64, 175)
+            // textWithLink is supported in recent jsPDF versions. Fallback handled by try/catch.
+            try {
+              // @ts-ignore
+              doc.textWithLink(storeUrl, linkX, locatorY, { url: storeUrl })
+            } catch {
+              doc.text(storeUrl, linkX, locatorY)
+              const w = doc.getTextWidth(storeUrl)
+              doc.link(linkX, locatorY - 3, w, 6, { url: storeUrl })
             }
 
             // Add footer

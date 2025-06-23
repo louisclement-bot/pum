@@ -4,7 +4,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
-import { useChartVisibility } from "@/hooks/use-chart-visibility"
+// use relative path to avoid ts/webpack alias issues during build
+import { useChartVisibility } from "../../hooks/use-chart-visibility"
 
 interface CumulativeRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -61,7 +62,6 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   }
 
   return (
-    {/* attach visibility/resize observer ref */}
     <div ref={ref} className={`w-full h-[300px] ${className}`}>
       {!mounted ? (
         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
@@ -145,5 +145,3 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
     </div>
   )
 }
-
-    <div ref={ref} className={`w-full h-[300px] ${className}`}>

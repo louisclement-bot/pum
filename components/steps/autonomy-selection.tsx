@@ -15,7 +15,7 @@ type AutonomySelectionProps = {
 }
 
 export default function AutonomySelection({ data, updateData, nextStep, prevStep }: AutonomySelectionProps) {
-  const [autonomy, setAutonomy] = useState<number>(data.autonomyWeeks || 2)
+  const [autonomy, setAutonomy] = useState<number>(data.autonomyWeeks || 3)
 
   const handleNext = () => {
     // Calculate results before moving to the next step
@@ -67,7 +67,7 @@ export default function AutonomySelection({ data, updateData, nextStep, prevStep
     const annualWaterNeeds = annualWaterNeedsM3 * 1000
 
     // Calculate recommended tank size based on water needs
-    const autonomyWeeks = data.autonomyWeeks || 2
+    const autonomyWeeks = data.autonomyWeeks || 3
 
     // Utiliser le minimum entre l'eau récupérable et les besoins pour un dimensionnement optimal
     const effectiveAnnualWaterM3 = Math.min(annualWaterCollectableM3, annualWaterNeedsM3)

@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider"
 import StepButtons from "../ui-elements/step-buttons"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState } from "react"
+import { getRecommendedTankSize } from "@/lib/volumeCalculator"
 
 type AutonomySelectionProps = {
   data: SimulatorData
@@ -71,8 +72,8 @@ export default function AutonomySelection({ data, updateData, nextStep, prevStep
     // Utiliser le minimum entre l'eau récupérable et les besoins pour un dimensionnement optimal
     const effectiveAnnualWaterM3 = Math.min(annualWaterCollectableM3, annualWaterNeedsM3)
     const recommendedTankSizeM3 = (effectiveAnnualWaterM3 / 52) * autonomyWeeks
-    // Conversion en litres et arrondi au litre supérieur
-    const recommendedTankSize = Math.ceil(recommendedTankSizeM3 * 1000)
+    // Conversion en litres puis arrondi au prochain volume disponible via catalogue
+    const { volume: recommendedTankSize } = getRecommendedTankSize(recommendedTankSizeM3 * 1000)
 
     // Calculate potential savings
     const potentialSavings = Math.min(annualWaterCollectableM3, annualWaterNeedsM3) // en m³

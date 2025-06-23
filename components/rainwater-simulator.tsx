@@ -18,6 +18,7 @@ import { ThemeToggle } from "./ui-elements/theme-toggle"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { PumLogo } from "./ui-elements/pum-logo"
 import type { JSX } from "react/jsx-runtime"
+import type { Aid } from "@/types/financialAidTypes"
 
 export type UsageType = "garden" | "toilet" | "washing"
 
@@ -49,6 +50,8 @@ export type SimulatorData = {
   potentialSavings?: number // in m³
   potentialSavingsEuros?: number // in euros
   coverageRate?: number // percentage
+  /* ─────────── Early-fetch financial aids ─────────── */
+  financialAids?: Aid[]
 }
 
 // Define step structure for clarity
@@ -429,7 +432,7 @@ export default function RainwaterSimulator() {
   const restart = useCallback(() => {
     setCurrentStep(1)
     setCurrentSubStep(1)
-    setData({ usages: [] })
+    setData({ usages: [], financialAids: undefined })
     setNavigationHistory([])
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, [])

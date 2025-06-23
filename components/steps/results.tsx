@@ -40,8 +40,17 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
   // Round value up to the next multiple of 5 (e.g. 280.65 -> 285)
   const roundUpToNearest5 = (val: number) => Math.ceil(val / 5) * 5
 
-  // Check if we have postal code to enable financial aid button
-  const canShowFinancialAid = !!data.postalCode
+  // ────────────────────────────────
+  // Financial aid button logic
+  //  • primary condition  : at least one aid fetched early
+  //  • fallback condition : we still have a postcode (legacy behaviour)
+  // ────────────────────────────────
+  const aidsCount = data.financialAids?.length ?? 0
+  const canShowFinancialAid = aidsCount > 0 || !!data.postalCode
+  const aidLabel =
+    aidsCount > 0
+      ? `Voir les ${aidsCount} aide${aidsCount > 1 ? "s" : ""} disponibles`
+      : "Voir les aides disponibles"
 
   // Animation variants
   const containerVariants = {
@@ -245,7 +254,7 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
             onClick={() => goToStep(STEP_IDS.FINANCIAL_AID)}
             className="flex-1 py-2 md:py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm md:text-base"
           >
-            Voir les aides disponibles
+            {aidLabel}
             <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
           </Button>
         )}

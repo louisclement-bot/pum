@@ -5,8 +5,19 @@ import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
-import { useState, useEffect } from "react"
-import { Euro, Building, MapPin, Info, Edit3, ExternalLink, Mail, Phone, FileText, Home } from "lucide-react"
+import { useState } from "react"
+import {
+  Euro,
+  Building,
+  MapPin,
+  Info,
+  Edit3,
+  ExternalLink,
+  Mail,
+  Phone,
+  FileText,
+  Home,
+} from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
@@ -18,57 +29,15 @@ type FinancialAidProps = {
 }
 
 export default function FinancialAid({ data, nextStep, prevStep, goToStep }: FinancialAidProps) {
-  const [aids, setAids] = useState<Aid[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  /**
+   * Offline-first: aids are fetched upstream (Rainfall step) and injected
+   * into SimulatorData.  If the field is still `undefined`, we assume the
+   * early-fetch is pending (user navigated very fast) and keep the loading
+   * skeleton for a better UX.
+   */
+  const isLoading = data.financialAids === undefined
+  const aids: Aid[] = data.financialAids ?? []
   const [expandedAids, setExpandedAids] = useState<Record<string, boolean>>({})
-
-  useEffect(() => {
-    const fetchAids = async () => {
-      // Reset states
-      setIsLoading(true)
-      setError(null)
-      setAids([])
-
-      const postcode = data.postalCode
-
-      // AidesFi API needs the *postal code* so it can resolve the authoritative
-      // INSEE code internally. If we don't have it, we cannot continue.
-      if (!postcode) {
-        setError("Code postal manquant – impossible de rechercher les aides financières.")
-        setIsLoading(false)
-        return
-      }
-
-      const params = new URLSearchParams()
-      params.append("postcode", postcode)
-
-      try {
-        console.debug("[FinancialAid] Fetching aids with postalCode:", postcode)
-        const res = await fetch(`/api/financial-aid?${params.toString()}`)
-        const json = await res.json()
-
-        if (!res.ok) {
-          // API error propagated
-          throw new Error(json.error || "Erreur inconnue")
-        }
-
-        if (Array.isArray(json.aids)) {
-          setAids(json.aids)
-        } else {
-          setAids([])
-        }
-      } catch (e: any) {
-        console.error("[FinancialAid] Error while fetching aids:", e)
-        setError(e.message || "Une erreur est survenue lors de la récupération des aides.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchAids()
-    // Depend on postalCode / citycode changes
-  }, [data.postalCode])
 
   // Toggle expanded state for an aid
   const toggleExpand = (id: string) => {
@@ -173,7 +142,7 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                       <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
                     </div>
                   </div>
-                  
+
                   {/* Toggle details button */}
                   <div className="mt-4">
                     <Button
@@ -297,14 +266,6 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
             </p>
           </div>
         </div>
-      ) : error ? (
-        <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-100 dark:border-red-800 max-w-3xl mx-auto">
-          <div className="flex items-center mb-4">
-            <Info className="h-6 w-6 text-red-600 dark:text-red-400 mr-3" />
-            <h3 className="text-lg font-medium text-red-700 dark:text-red-300">Erreur</h3>
-          </div>
-          <p className="text-red-700 dark:text-red-300 ml-9">{error}</p>
-        </div>
       ) : (
         <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-100 dark:border-blue-800 max-w-3xl mx-auto">
           <div className="flex items-center mb-4">
@@ -314,8 +275,8 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
             </h3>
           </div>
           <p className="text-blue-700 dark:text-blue-300 ml-9">
-            Aucune aide financière n&apos;est disponible dans votre région pour la récupération d&apos;eau de pluie.
-            Cela peut changer, n&apos;hésitez pas à consulter régulièrement notre site ou à contacter votre mairie.
+            Aucune aide financière n'est disponible dans votre région pour la récupération d'eau de pluie.
+            Cela peut changer, n'hésitez pas à consulter régulièrement notre site ou à contacter votre mairie.
           </p>
         </div>
       )}

@@ -9,6 +9,7 @@ import { useState, useEffect } from "react"
 import { CloudRain, MapPin, Search, Loader2, AlertCircle, Edit3 } from "lucide-react"
 import { geocodeAddressViaBAN } from "@/lib/geocodeService"
 import { getAverageAnnualPluviometry, getDetailedPluviometryData } from "@/lib/pluvioService"
+import { fetchFinancialAids } from "@/lib/useFinancialAid"
 
 type RainfallProps = {
   data: SimulatorData
@@ -25,48 +26,10 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
   const [manualInput, setManualInput] = useState<boolean>(false)
   const [manualRainfall, setManualRainfall] = useState<string>("")
   const [dataSource, setDataSource] = useState<string>("none")
+  const [fetchingAids, setFetchingAids] = useState<boolean>(false)
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(
     data.latitude && data.longitude ? { latitude: data.latitude, longitude: data.longitude } : null,
   )
-
-  /**
-   * Persist freshly-fetched rainfall in the global simulator state.
-   * Doing it here – instead of waiting for “Continuer” – allows the user
-   * to go back / forth without losing the data and re-enables the
-   * “Continuer” button on their return.
-   */
-  const persistRainfall = (
-    annual: number,
-    src: string,
-    lat?: number,
-    lon?: number,
-    extra?: Awaited<ReturnType<typeof getDetailedPluviometryData>>,
-  ) => {
-    const update: Partial<SimulatorData> = {
-      annualRainfall: annual,
-      rainfallDataSource: src,
-      // Keep existing postalCode if already stored
-      postalCode: postalCode || data.postalCode,
-    }
-
-    if (lat !== undefined && lon !== undefined) {
-      update.latitude = lat
-      update.longitude = lon
-    }
-
-    if (extra) {
-      update.detailedPrecipitationData = {
-        monthlyData: extra.monthlyData,
-        totalPrecipitation: extra.totalPrecipitation,
-        totalRain: extra.totalRain,
-        totalSnow: extra.totalSnow,
-        source: extra.source,
-        period: extra.period,
-      }
-    }
-
-    updateData(update)
-  }
 
   // If we already have address data, fetch rainfall on component mount
   useEffect(() => {
@@ -79,17 +42,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     }
   }, [data.postalCode, data.annualRainfall, data.rainfallDataSource])
 
-  // Safety – rehydrate local state if global rainfall appears after mount
-  useEffect(() => {
-    if (!rainfall && data.annualRainfall) {
-      setRainfall(data.annualRainfall)
-      setDataSource(data.rainfallDataSource || "existing")
-    }
-  }, [data.annualRainfall])
-
   /**
    * Allow the user to reset postcode-related data so they can enter a new one.
-   * Clears both the parent simulator state and this component’s local state.
+   * Clears both the parent simulator state and this component's local state.
    */
   const handleModifyZipcode = () => {
     // 1. Reset data in parent
@@ -138,15 +93,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
             console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
           }
 
-          // Persist to parent state immediately
-          persistRainfall(
-            Math.round(pluviometryData.value),
-            "OpenMeteo API",
-            data.latitude,
-            data.longitude,
-            detailedData,
-          )
-
           setIsLoading(false)
           return
         }
@@ -174,14 +120,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
             if (detailedData) {
               console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
             }
-
-            persistRainfall(
-              Math.round(pluviometryData.value),
-              "OpenMeteo API",
-              latitude,
-              longitude,
-              detailedData,
-            )
 
             setIsLoading(false)
             return
@@ -215,14 +153,6 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
           if (detailedData) {
             console.log("[DATA SOURCE] Successfully retrieved detailed precipitation data from OpenMeteo API")
           }
-
-          persistRainfall(
-            Math.round(pluviometryData.value),
-            "OpenMeteo API",
-            latitude,
-            longitude,
-            detailedData,
-          )
 
           setIsLoading(false)
           return
@@ -295,8 +225,23 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
     }
 
     console.log("[DATA SOURCE] Updating SimulatorData with rainfall data source:", dataSource)
-    updateData(dataUpdate)
-    nextStep()
+    
+    /* ────────────────────────────────
+     * Early-fetch financial aids
+     * ──────────────────────────────── */
+    try {
+      setFetchingAids(true)
+      const aids = await fetchFinancialAids(dataUpdate.postalCode || data.postalCode, data.citycode)
+      dataUpdate.financialAids = aids
+      console.log("[AID_FETCH] Stored", aids.length, "financial aids into SimulatorData")
+    } catch (e) {
+      console.error("[AID_FETCH] Error while fetching financial aids:", e)
+      dataUpdate.financialAids = [] // Store empty array on error
+    } finally {
+      setFetchingAids(false)
+      updateData(dataUpdate)
+      nextStep()
+    }
   }
 
   return (
@@ -502,8 +447,9 @@ export default function Rainfall({ data, updateData, nextStep, prevStep }: Rainf
         /* Disable only if neither local nor parent rainfall is valid */
         nextDisabled={
           ((!rainfall || rainfall <= 0) && (!data.annualRainfall || data.annualRainfall <= 0))
+          || fetchingAids
         }
-        nextLabel="Continuer"
+        nextLabel={fetchingAids ? "Recherche des aides…" : "Continuer"}
       />
     </div>
   )

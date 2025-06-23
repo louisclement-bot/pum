@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { SimulatorData } from "../rainwater-simulator"
 import { useState, useEffect } from "react"
-import { Euro, Building, MapPin, Info, Edit3 } from "lucide-react"
+import { Euro, Building, MapPin, Info, Edit3, ChevronDown, ChevronUp, ExternalLink, Mail, Phone, FileText, Home } from "lucide-react"
 import type { Aid } from "@/types/financialAidTypes"
 
 type FinancialAidProps = {
@@ -21,6 +21,7 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
   const [aids, setAids] = useState<Aid[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [expandedAids, setExpandedAids] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const fetchAids = async () => {
@@ -68,6 +69,14 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
     fetchAids()
     // Depend on postalCode / citycode changes
   }, [data.postalCode])
+
+  // Toggle expanded state for an aid
+  const toggleExpand = (id: string) => {
+    setExpandedAids((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }))
+  }
 
   return (
     <div className="space-y-8">
@@ -136,7 +145,20 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
             <Card key={aid.id} className="border border-blue-100 dark:border-blue-800 overflow-hidden">
               <CardContent className="p-0">
                 <div className="border-l-4 border-[#1D40AF] dark:border-blue-500 p-6">
-                  <h3 className="font-bold text-xl text-[#1D40AF] dark:text-blue-300 mb-4">{aid.name}</h3>
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-bold text-xl text-[#1D40AF] dark:text-blue-300">{aid.name}</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleExpand(aid.id)}
+                      className="text-blue-600 dark:text-blue-400 p-1 h-auto"
+                      aria-label={expandedAids[aid.id] ? "Réduire les détails" : "Voir plus de détails"}
+                    >
+                      {expandedAids[aid.id] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                    </Button>
+                  </div>
+                  
+                  {/* Basic information - always visible */}
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
@@ -160,6 +182,105 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                       <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
                     </div>
                   </div>
+                  
+                  {/* Expanded information - visible only when expanded */}
+                  {expandedAids[aid.id] && (
+                    <div className="mt-5 pt-5 border-t border-blue-100 dark:border-blue-800 space-y-4">
+                      {/* Description */}
+                      {aid.description && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+                          <p className="text-sm text-gray-700 dark:text-gray-300">{aid.description}</p>
+                        </div>
+                      )}
+                      
+                      {/* Program Description */}
+                      {aid.programDescription && (
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">À propos du programme</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{aid.programDescription}</p>
+                        </div>
+                      )}
+                      
+                      {/* Contact Information */}
+                      {(aid.address || aid.city || aid.postalCode || aid.phone || aid.email) && (
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Contact</h4>
+                          
+                          {/* Address */}
+                          {aid.address && (
+                            <div className="flex items-start text-sm">
+                              <Home className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-600 dark:text-gray-400">
+                                {aid.address}
+                                {(aid.city || aid.postalCode) && (
+                                  <>
+                                    <br />
+                                    {aid.postalCode && <span>{aid.postalCode} </span>}
+                                    {aid.city && <span>{aid.city}</span>}
+                                  </>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Phone */}
+                          {aid.phone && (
+                            <div className="flex items-center text-sm">
+                              <Phone className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
+                              <a 
+                                href={`tel:${aid.phone.replace(/\s/g, '')}`} 
+                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                              >
+                                {aid.phone}
+                              </a>
+                            </div>
+                          )}
+                          
+                          {/* Email */}
+                          {aid.email && (
+                            <div className="flex items-center text-sm">
+                              <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
+                              <a 
+                                href={`mailto:${aid.email}`} 
+                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                              >
+                                {aid.email}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Links */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                        {/* Website */}
+                        {aid.website && (
+                          <a 
+                            href={aid.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-sm bg-blue-100 dark:bg-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1.5" />
+                            Site web
+                          </a>
+                        )}
+                        
+                        {/* Documentation */}
+                        {aid.documentationLink && (
+                          <a 
+                            href={aid.documentationLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-sm bg-blue-100 dark:bg-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                          >
+                            <FileText className="h-4 w-4 mr-1.5" />
+                            Documentation
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -196,18 +317,18 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-10">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-10">
         <Button
           variant="outline"
           onClick={prevStep}
-          className="flex-1 sm:flex-none py-2 md:py-3 px-6 rounded-xl border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-300"
+          className="py-2 md:py-3 px-6 rounded-xl border-blue-200 dark:border-blue-800 text-[#1D40AF] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-300"
         >
           Précédent
         </Button>
 
         <Button
           onClick={nextStep}
-          className="flex-1 sm:flex-none py-2 md:py-3 px-6 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+          className="py-2 md:py-3 px-6 rounded-xl bg-[#1D40AF] hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
         >
           Voir les produits recommandés
         </Button>

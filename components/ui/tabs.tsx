@@ -52,17 +52,18 @@ const TabsContent = React.forwardRef<
          New strategy:
          • Keep panels mounted (forceMount) so heavy children (charts…) only
            initialise once.
-         • Instead of CSS-grid stacking, inactive panels are moved **far
-           off-screen** with absolute positioning.  
-           They keep their natural width/height, so libraries such as Recharts
-           can measure the container correctly on first mount.
+         • Inactive panels are hidden via `visibility:hidden` instead of
+           being moved off-screen.  
+           This preserves their width/height in the document flow, allowing
+           libraries such as Recharts to measure the container correctly
+           on first mount while avoiding absolute-position side-effects.
       ------------------------------------------------------------------ */
       "transition-opacity duration-300",
       "data-[state=inactive]:opacity-0 data-[state=inactive]:pointer-events-none",
-      // Off-screen while inactive but still participates in layout
-      "data-[state=inactive]:absolute data-[state=inactive]:-left-[200vw] data-[state=inactive]:top-0",
-      // Back to normal flow when active
-      "data-[state=active]:opacity-100 data-[state=active]:relative",
+      // Hide visually but keep the element in the layout
+      "data-[state=inactive]:invisible",
+      // Ensure active panel is fully visible
+      "data-[state=active]:opacity-100 data-[state=active]:visible",
       className,
     )}
     {...props}

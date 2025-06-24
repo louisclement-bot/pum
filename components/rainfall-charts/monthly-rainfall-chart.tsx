@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import ChartWrapper from "./ChartWrapper"
 
 interface MonthlyRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -14,16 +15,12 @@ interface MonthlyRainfallChartProps {
 export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRainfallChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
-  const [mounted, setMounted] = useState(false) // Helps with SSR / hydration issues
 
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
 
-  // mark mounted once we hit the client
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+
 
   // Process data when it changes
   useEffect(() => {
@@ -60,24 +57,17 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
   }
 
   return (
-    <div className={`w-full h-[300px] ${className}`}>
-      {!mounted ? (
-        // Only check for mounted status, not visibility
-        <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
-          Initialising chart…
-        </div>
-      ) : (
-        <>
-          <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: isMobile ? 0 : 20,
-              bottom: 5,
-            }}
-          >
+    <ChartWrapper className={className}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={chartData}
+          margin={{
+            top: 5,
+            right: 30,
+            left: isMobile ? 0 : 20,
+            bottom: 5,
+          }}
+        >
             <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
             <XAxis
               dataKey={isMobile ? "shortMonth" : "month"}
@@ -131,10 +121,8 @@ export default function MonthlyRainfallChart({ data, className = "" }: MonthlyRa
               animationDuration={1000}
               isAnimationActive={true}
             />
-          </BarChart>
-          </ResponsiveContainer>
-        </>
-      )}
-    </div>
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartWrapper>
   )
 }

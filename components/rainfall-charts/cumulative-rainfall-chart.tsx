@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { MonthlyPrecipitationData } from "@/lib/pluvioService"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useTheme } from "next-themes"
+import ChartWrapper from "./ChartWrapper"
 
 interface CumulativeRainfallChartProps {
   data: MonthlyPrecipitationData[]
@@ -13,15 +14,9 @@ interface CumulativeRainfallChartProps {
 export default function CumulativeRainfallChart({ data, className = "" }: CumulativeRainfallChartProps) {
   const [chartData, setChartData] = useState<any[]>([])
   const [maxValue, setMaxValue] = useState<number>(0)
-  const [mounted, setMounted] = useState(false) // SSR / hydration helper
   const isMobile = useMediaQuery("(max-width: 640px)")
   const { theme } = useTheme()
   const isDark = theme === "dark"
-
-  // mark component as mounted (client)
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // Process data when it changes
   useEffect(() => {
@@ -58,12 +53,7 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
   }
 
   return (
-    <div className={`w-full h-[300px] ${className}`}>
-      {!mounted ? (
-        <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
-          Initialising chart…
-        </div>
-      ) : (
+    <ChartWrapper className={className}>
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -135,7 +125,6 @@ export default function CumulativeRainfallChart({ data, className = "" }: Cumula
             />
           </LineChart>
         </ResponsiveContainer>
-      )}
-    </div>
+    </ChartWrapper>
   )
 }

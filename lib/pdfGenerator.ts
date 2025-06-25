@@ -76,6 +76,8 @@ export async function generateSimulationPDF(
   doc.setTextColor(29, 64, 175)
   doc.text("Produits recommandés", 20, productsStartY)
   
+  // Dynamically position tank table right after the section title
+  const tankStartY = productsStartY + 5
   // Create a table for tanks with reference column
   const tankColumns = ["Référence", "Produit", "Type", "Volume"]
   const tankRows = recommendedTanks.map((tank) => [
@@ -88,7 +90,7 @@ export async function generateSimulationPDF(
   autoTable(doc, {
     head: [tankColumns],
     body: tankRows,
-    startY: 120,
+    startY: tankStartY,
     headStyles: { fillColor: [29, 64, 175] },
     styles: {
       font: "helvetica",
@@ -101,6 +103,7 @@ export async function generateSimulationPDF(
   
   // Add pump table if we have pumps
   if (recommendedPumps.length > 0) {
+    // Place pump section after the tank table
     const pumpY = (doc as any).lastAutoTable.finalY + 20
     
     doc.setFontSize(12)

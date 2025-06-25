@@ -260,7 +260,8 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
       <div className="relative">
         {/* White base layer + gradient overlay to guarantee solid backdrop under transparent PNGs */}
         <div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700"></div>
+          {/* Ensure the gradient stays *behind* the product image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 z-0"></div>
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}

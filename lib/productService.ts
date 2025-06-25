@@ -367,8 +367,8 @@ export async function getAdditionalRecommendedTanks(
       }
     }
     
-    // Limit to 9 tanks maximum
-    return additionalTanks.slice(0, 9);
+    // Limit to 3 extra tanks (top-3 are handled upstream → 6 tanks max)
+    return additionalTanks.slice(0, 3);
   } catch (error) {
     console.error("[productService] getAdditionalRecommendedTanks failed:", error);
     return [];

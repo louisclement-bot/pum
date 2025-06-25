@@ -258,42 +258,21 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group dark:bg-slate-800 dark:border-slate-700 border border-blue-100 h-full flex flex-col">
       <div className="relative">
-        {/* WHITE base layer + gradient overlay to guarantee solid backdrop under transparent PNGs */}
-        <div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden border-4 border-red-500">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700"></div>
-          
-          {/* Debug info */}
-          <div className="absolute top-0 left-0 bg-yellow-300 text-black text-xs p-1 z-20">
-            URL: {product.imageUrl?.substring(0, 30)}...
-          </div>
-          
-          {/* Test with a simple image first */}
+        {/* White base + subtle gradient; product image always on top */}
+        <div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden">
+          {/* Gradient overlay kept behind the image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 z-0"></div>
+
+          {/* Product image */}
           <img
-            src="https://via.placeholder.com/300x200/0000FF/FFFFFF?text=TEST"
-            alt="Test image"
-            className="absolute inset-0 w-full h-full object-cover z-10 border-2 border-green-500"
-            onLoad={() => {
-              console.log(`✅ TEST Image loaded successfully`);
-            }}
-            onError={(e) => {
-              console.error(`❌ TEST Image failed to load`);
-            }}
-          />
-          
-          {/* Original image - but with explicit sizing and debug border */}
-          <img
-            src={product.imageUrl || "https://via.placeholder.com/300x200/FF0000/FFFFFF?text=FALLBACK"}
+            src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}
-            className="relative z-15 w-full h-full object-contain border-4 border-purple-500"
+            className="relative z-10 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
-            onLoad={() => {
-              console.log(`✅ Product image loaded:`, product.imageUrl);
-            }}
             onError={(e) => {
-              console.error(`❌ Product image failed to load:`, product.imageUrl);
-              const target = e.currentTarget as HTMLImageElement;
-              if (target.src !== "https://via.placeholder.com/300x200/FF0000/FFFFFF?text=ERROR") {
-                target.src = "https://via.placeholder.com/300x200/FF0000/FFFFFF?text=ERROR";
+              const target = e.currentTarget as HTMLImageElement
+              if (target.src !== "/placeholder.svg") {
+                target.src = "/placeholder.svg"
               }
             }}
           />

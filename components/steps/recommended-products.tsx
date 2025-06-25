@@ -258,10 +258,12 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group dark:bg-slate-800 dark:border-slate-700 border border-blue-100 h-full flex flex-col">
       <div className="relative">
-        {/* White base layer + gradient overlay to guarantee solid backdrop under transparent PNGs */}
-        <div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden">
-          {/* Ensure the gradient stays *behind* the product image */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 z-0"></div>
+        {/* Solid white base + optional gradient BEHIND the product image */}
+        <div className="aspect-video relative flex items-center justify-center overflow-hidden">
+          {/* 1️⃣ Solid white layer */}
+          <div className="absolute inset-0 bg-white z-0" />
+          {/* 2️⃣ Subtle gradient (still behind the PNG) */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 z-0" />
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}
@@ -269,11 +271,11 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
           />
         </div>
         {isBestseller && (
-          <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-[#1D40AF] text-white text-xs font-bold px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md">
+          <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20 bg-[#1D40AF] text-white text-xs font-bold px-2 py-0.5 md:px-3 md:py-1 rounded-full shadow-md">
             BESTSELLER
           </div>
         )}
-        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-blue-100 dark:bg-blue-900/70 text-[#1D40AF] dark:text-blue-200 text-xs font-medium px-2 py-0.5 md:px-3 md:py-1 rounded-full">
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 z-20 bg-blue-100 dark:bg-blue-900/70 text-[#1D40AF] dark:text-blue-200 text-xs font-medium px-2 py-0.5 md:px-3 md:py-1 rounded-full">
           {product.type === "aerial" ? "Aérien" : product.type === "buried" ? "Enterré" : "Pompe"}
         </div>
       </div>

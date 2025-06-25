@@ -4,39 +4,6 @@ import type { SimulatorData } from "@/components/rainwater-simulator"
 import type { Product } from "@/lib/productService"
 
 /**
- * Loads the PUM logo SVG and converts it to base64 for PDF embedding
- * Uses a cached promise to avoid multiple fetches
- */
-let logoPromise: Promise<string> | null = null
-
-async function loadPumLogo(): Promise<string> {
-  if (!logoPromise) {
-    logoPromise = new Promise(async (resolve) => {
-      try {
-        // Fetch the SVG file
-        const response = await fetch("/images/pum-logo.svg")
-        if (!response.ok) {
-          throw new Error(`Failed to load PUM logo: ${response.status}`)
-        }
-        
-        // Get SVG content as text
-        const svgText = await response.text()
-        
-        // Convert to base64
-        const base64Logo = `data:image/svg+xml;base64,${btoa(svgText)}`
-        resolve(base64Logo)
-      } catch (error) {
-        console.error("Error loading PUM logo:", error)
-        // Return a fallback simple logo or empty string
-        resolve("")
-      }
-    })
-  }
-  
-  return logoPromise
-}
-
-/**
  * Generates a PDF document with simulation results and product recommendations
  * 
  * @param data Simulation data with user inputs and calculated results
@@ -56,16 +23,17 @@ export async function generateSimulationPDF(
    * 1️⃣  HEADER : PUM logo and title
    * --------------------------------------------------------- */
   try {
-    // Load PUM logo dynamically
-    const logoBase64 = await loadPumLogo()
-    
-    if (logoBase64) {
+    // Load PNG logo
+    const res = await fetch("/images/pum-logo.png")
+    if (res.ok) {
+      const buffer = await res.arrayBuffer()
       // Draw logo (≈40 × 11 mm) on the left side of the header
-      doc.addImage(logoBase64, "SVG", 15, 12, 40, 11)
+      doc.addImage(buffer, "PNG", 15, 12, 40, 11)
+    } else {
+      console.warn("Unable to fetch PUM PNG logo, status:", res.status)
     }
   } catch (e) {
-    console.warn("Unable to embed PUM logo in PDF:", e)
-    // Continue without logo if there's an error
+    console.warn("Unable to embed PUM PNG logo in PDF:", e)
   }
   
   // Add title
@@ -79,29 +47,26 @@ export async function generateSimulationPDF(
   doc.setFontSize(12)
   doc.setTextColor(0, 0, 0)
   doc.text("Informations sur votre projet", 20, 40)
-  
-  doc.setFontSize(10)
-  doc.text(
-    `Volume de cuve recommandé: ${data.recommendedTankSize ? (data.recommendedTankSize / 1000).toFixed(1) : 0} m³`,
-    20,
-    50,
-  )
-  doc.text(
-    `Eau récupérable par an: ${data.annualWaterCollectable ? (data.annualWaterCollectable / 1000).toFixed(1) : 0} m³`,
-    20,
-    60,
-  )
-  doc.text(
-    `Besoins en eau par an: ${data.annualWaterNeeds ? (data.annualWaterNeeds / 1000).toFixed(1) : 0} m³`,
-    20,
-    70,
-  )
-  doc.text(`Taux de couverture: ${data.coverageRate ? data.coverageRate.toFixed(1) : 0}%`, 20, 80)
-  doc.text(
-    `Économie potentielle: ${data.potentialSavingsEuros ? data.potentialSavingsEuros.toFixed(2) : 0} €/an`,
-    20,
-    90,
-  )
+
+  // Build cartridge-style table with the same values as the web UI
+  const infoRows = [
+    ["Eau récupérable", `${(data.annualWaterCollectable! / 1000).toFixed(0)} m³/an`],
+    ["Besoins en eau", `${(data.annualWaterNeeds! / 1000).toFixed(0)} m³/an`],
+    ["Volume cuve recommandé", `${(data.recommendedTankSize! / 1000).toFixed(1)} m³`],
+    ["Économie potentielle", `${Math.ceil(data.potentialSavingsEuros!)} €/an`],
+  ]
+
+  autoTable(doc, {
+    head: [["Indicateur", "Valeur"]],
+    body: infoRows,
+    startY: 45,
+    headStyles: { fillColor: [29, 64, 175] },
+    styles: { font: "helvetica", lineColor: [220, 220, 220] },
+    alternateRowStyles: { fillColor: [245, 245, 255] },
+  })
+
+  // Y-coordinate for subsequent sections
+  const productsStartY = (doc as any).lastAutoTable.finalY + 15
   
   /* -----------------------------------------------------------
    * 3️⃣  PRODUCT TABLES : tanks and pumps with references
@@ -109,7 +74,7 @@ export async function generateSimulationPDF(
   // Section title
   doc.setFontSize(12)
   doc.setTextColor(29, 64, 175)
-  doc.text("Produits recommandés", 20, 110)
+  doc.text("Produits recommandés", 20, productsStartY)
   
   // Create a table for tanks with reference column
   const tankColumns = ["Référence", "Produit", "Type", "Volume"]
@@ -142,16 +107,9 @@ export async function generateSimulationPDF(
     doc.setTextColor(29, 64, 175)
     doc.text("Pompes recommandées", 20, pumpY)
     
-    // Pump table with reference column
-    const pumpColumns = ["Référence", "Produit", "Type", "Compatibilité"]
-    const pumpRows = recommendedPumps.map((pump) => [
-      `Réf: ${pump.id}`,
-      pump.name,
-      "Pompe",
-      pump.compatibleWithBuriedVolumes
-        ? `Cuves ${pump.compatibleWithBuriedVolumes.join(", ")}L`
-        : "Toutes cuves",
-    ])
+    // Pump table – only useful columns
+    const pumpColumns = ["Référence", "Produit"]
+    const pumpRows = recommendedPumps.map((pump) => [`Réf: ${pump.id}`, pump.name])
     
     autoTable(doc, {
       head: [pumpColumns],

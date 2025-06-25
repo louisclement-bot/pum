@@ -89,10 +89,6 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
             ? "bg-amber-500 dark:bg-amber-600"
             : "bg-red-500 dark:bg-red-600"
 
-  // Determine best text colour for readability based on the bar shade
-  const textColor =
-    coveragePercentage < 50 ? "text-slate-900 dark:text-white" : "text-white"
-
   // Handle share button click
   const handleShare = () => {
     setShowShareOptions(!showShareOptions)
@@ -190,22 +186,22 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
 
         <div className="relative w-full h-5 md:h-8 bg-white dark:bg-slate-800 rounded-full mb-4 md:mb-6 overflow-hidden shadow-inner print:border print:border-gray-300">
           <div
-            className={`absolute top-0 left-0 h-full ${coverageColor} rounded-full transition-all duration-1000 print:bg-blue-500`}
-            style={{ width: `${data.coverageRate}%` }}
+            className={`absolute inset-y-0 left-0 ${coverageColor} rounded-full transition-all duration-1000 print:bg-blue-500`}
+            style={{ width: `${coveragePercentage}%` }}
           >
             <div className="absolute inset-0 bg-white/20 bg-[length:10px_10px] bg-[0_0] bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] animate-[gradient_1s_linear_infinite]"></div>
           </div>
-          <div
-            className={`absolute top-0 h-full flex items-center justify-center px-2 md:px-3 font-bold ${textColor} text-xs md:text-sm print:text-white ${
-              coveragePercentage < 30 ? "left-0 ml-2" : ""
-            }`}
-            style={{
-              left: coveragePercentage < 30 ? "0" : `${Math.min(Math.max(data.coverageRate || 0, 30), 90)}%`,
-              textShadow: "0px 0px 2px rgba(0,0,0,0.5)",
+          
+          {/* Updated percentage label with mix-blend-difference for automatic contrast */}
+          <span
+            className="absolute inset-y-0 flex items-center font-bold text-xs md:text-sm px-2 mix-blend-difference text-white select-none"
+            style={{ 
+              left: `calc(${Math.min(coveragePercentage, 95)}% - 1.5rem)`,
+              textShadow: "0px 0px 2px rgba(0,0,0,0.5)"
             }}
           >
             {formatNumber(data.coverageRate, 1)}%
-          </div>
+          </span>
         </div>
 
         <div className="text-center">
@@ -229,22 +225,24 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
       </motion.div>
 
       {/* Rainfall Details Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="print:hidden"
-      >
-        <RainfallDetails data={data} className="mt-6 md:mt-10" />
-      </motion.div>
+      {/* ---- Mobile order wrapper: CTA above precipitation details on small screens ---- */}
+      <div className={isMobile ? "flex flex-col-reverse gap-6" : ""}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="print:hidden"
+        >
+          <RainfallDetails data={data} className="mt-6 md:mt-10" />
+        </motion.div>
 
-      {/* Action buttons */}
-      <motion.div
-        className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-6 md:mt-10 print:hidden"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.5 }}
-      >
+        {/* Action buttons */}
+        <motion.div
+          className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-6 md:mt-10 print:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
         <Button
           variant="outline"
           onClick={prevStep}
@@ -271,6 +269,7 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
           <ChevronRight className="ml-1 md:ml-2 h-3 w-3 md:h-4 md:w-4" />
         </Button>
       </motion.div>
+      </div> {/* end mobile order wrapper */}
 
       {/* Share and Print buttons */}
       <motion.div

@@ -264,7 +264,7 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}
-            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+            className="relative z-10 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
           />
         </div>
         {isBestseller && (

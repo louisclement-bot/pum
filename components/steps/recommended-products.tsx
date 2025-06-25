@@ -258,12 +258,10 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group dark:bg-slate-800 dark:border-slate-700 border border-blue-100 h-full flex flex-col">
       <div className="relative">
-        {/* Solid white base + optional gradient BEHIND the product image */}
+        {/* Solid white base behind the product image */}
         <div className="aspect-video relative flex items-center justify-center overflow-hidden">
           {/* 1️⃣ Solid white layer */}
           <div className="absolute inset-0 bg-white z-0" />
-          {/* 2️⃣ Subtle gradient (still behind the PNG) */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 z-0" />
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}

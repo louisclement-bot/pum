@@ -20,6 +20,12 @@ import { PumLogo } from "./ui-elements/pum-logo"
 import type { JSX } from "react/jsx-runtime"
 import type { Aid } from "@/types/financialAidTypes"
 
+// Spacer used to keep consistent top spacing on mobile when the desktop
+// header is hidden.  Height is negligible on larger viewports.
+function MobileHeaderSpacer() {
+  return <div className="sm:hidden h-2" />
+}
+
 export type UsageType = "garden" | "toilet" | "washing"
 
 export type SimulatorData = {
@@ -465,17 +471,21 @@ export default function RainwaterSimulator() {
 
       {/* Main content */}
       <div className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 relative z-10">
-        <header className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className="flex items-center justify-center">
-              <PumLogo width={96} height={48} />
+        {/* Desktop header – hidden on mobile */}
+        <div className="hidden sm:block">
+          <header className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="flex items-center justify-center">
+                <PumLogo width={96} height={48} />
+              </div>
             </div>
-            
-          </div>
+            {/* Theme toggle */}
+            <ThemeToggle />
+          </header>
+        </div>
 
-          {/* Theme toggle */}
-          <ThemeToggle />
-        </header>
+        {/* Keeps a tiny gap on mobile to avoid layout jump */}
+        <MobileHeaderSpacer />
 
         {/* Mobile progress bar */}
         {isMobile && (

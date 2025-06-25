@@ -258,7 +258,9 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group dark:bg-slate-800 dark:border-slate-700 border border-blue-100 h-full flex flex-col">
       <div className="relative">
-        <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center overflow-hidden">
+        {/* White base layer + gradient overlay to guarantee solid backdrop under transparent PNGs */}
+        <div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700"></div>
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.name}

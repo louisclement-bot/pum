@@ -9,7 +9,9 @@ type MobileProgressBarProps = {
 
 export function MobileProgressBar({ currentStep, totalSteps, className = "", steps }: MobileProgressBarProps) {
   return (
-    <div className={`w-full overflow-x-auto ${className}`}>
+    <div
+      className={`w-full overflow-x-auto sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur ${className}`}
+    >
       <div className="flex items-center min-w-max">
         {steps.map((step, index) => {
           const isActive = step.id === currentStep

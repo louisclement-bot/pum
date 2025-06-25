@@ -2,18 +2,11 @@
 import { useEffect, useState, useCallback } from "react"
 import type React from "react"
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Droplets, CloudRain, Snowflake, BarChart2, TableIcon, ChevronDown, ChevronUp } from "lucide-react"
-import MonthlyRainfallChart from "./rainfall-charts/monthly-rainfall-chart"
-import CumulativeRainfallChart from "./rainfall-charts/cumulative-rainfall-chart"
-import PrecipitationCompositionChart from "./rainfall-charts/precipitation-composition-chart"
-import RainfallDataTable from "./rainfall-charts/rainfall-data-table"
+import { Droplets, CloudRain, Snowflake } from "lucide-react"
 import type { DetailedPluviometryData } from "@/lib/pluvioService"
 import { getDetailedPluviometryData } from "@/lib/pluvioService"
 import type { SimulatorData } from "../rainwater-simulator"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
 
 interface RainfallDetailsProps {
   data: SimulatorData
@@ -26,7 +19,6 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [dataSource, setDataSource] = useState<string>("unknown")
-  const [isExpanded, setIsExpanded] = useState(false)
 
   // Function to fetch rainfall data with retry logic
   const fetchRainfallData = useCallback(async () => {
@@ -139,31 +131,12 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
   const wettestMonth = [...rainfallData.monthlyData].sort((a, b) => b.precipitation - a.precipitation)[0]
   const driestMonth = [...rainfallData.monthlyData].sort((a, b) => a.precipitation - b.precipitation)[0]
 
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded)
-  }
-
   return (
     <Card className={className}>
       <CardContent className="p-4 md:p-6">
-        <div className="flex justify-between items-center mb-4 md:mb-6">
-          <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-300">Détails des précipitations</h3>
-          <Button variant="ghost" size="sm" onClick={toggleExpand} className="text-blue-600 dark:text-blue-400">
-            {isExpanded ? (
-              <>
-                <ChevronUp className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Masquer les détails</span>
-                <span className="sm:hidden">Réduire</span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Voir les détails</span>
-                <span className="sm:hidden">Voir plus</span>
-              </>
-            )}
-          </Button>
-        </div>
+        <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-300 mb-4 md:mb-6">
+          Détails des précipitations
+        </h3>
 
         {/* Stat cards - always visible */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -183,61 +156,6 @@ export default function RainfallDetails({ data, className = "" }: RainfallDetail
             value={`${driestMonth.month} (${formatNumber(driestMonth.precipitation, 1)} mm)`}
           />
         </div>
-
-        {/* Collapsible section for charts and source info */}
-        <motion.div
-          initial={false}
-          animate={{
-            height: isExpanded ? "auto" : "0px",
-            opacity: isExpanded ? 1 : 0,
-          }}
-          transition={{
-            height: { duration: 0.3, ease: "easeInOut" },
-            opacity: { duration: 0.2, ease: "easeInOut" },
-          }}
-          className="overflow-hidden"
-        >
-          <Tabs defaultValue="monthly" className="w-full">
-            <TabsList className="w-full justify-start mb-4 bg-slate-100 dark:bg-slate-800 overflow-x-auto">
-              <TabsTrigger value="monthly" className="flex items-center gap-2">
-                <BarChart2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Précipitations</span> mensuelles
-              </TabsTrigger>
-              <TabsTrigger value="cumulative" className="flex items-center gap-2">
-                <Droplets className="h-4 w-4" />
-                <span className="hidden sm:inline">Précipitations</span> cumulées
-              </TabsTrigger>
-              <TabsTrigger value="composition" className="flex items-center gap-2">
-                <CloudRain className="h-4 w-4" />
-                Composition
-              </TabsTrigger>
-              <TabsTrigger value="table" className="flex items-center gap-2">
-                <TableIcon className="h-4 w-4" />
-                Tableau
-              </TabsTrigger>
-            </TabsList>
-
-              <TabsContent value="monthly" className="mt-4">
-                <MonthlyRainfallChart data={rainfallData.monthlyData} />
-              </TabsContent>
-              <TabsContent value="cumulative" className="mt-4">
-                <CumulativeRainfallChart data={rainfallData.monthlyData} />
-              </TabsContent>
-              <TabsContent value="composition" className="mt-4">
-                <PrecipitationCompositionChart rain={rainfallData.totalRain} snow={rainfallData.totalSnow} />
-              </TabsContent>
-              <TabsContent value="table" className="mt-4">
-                <RainfallDataTable data={rainfallData.monthlyData} />
-              </TabsContent>
-          </Tabs>
-
-          <div className="text-xs text-slate-500 dark:text-slate-400 italic mt-4">
-            Source:{" "}
-            {dataSource === "USER_INPUT"
-              ? "Données saisies manuellement."
-              : "Open-Meteo API. Les données sont basées sur des prévisions et peuvent varier."}
-          </div>
-        </motion.div>
       </CardContent>
     </Card>
   )

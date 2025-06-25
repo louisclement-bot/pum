@@ -120,26 +120,32 @@ export default function FinancialAid({ data, nextStep, prevStep, goToStep }: Fin
                   
                   {/* Basic information - always visible */}
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center">
+                    <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
                       <div className="flex items-center">
                         <Building className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
                         <span className="text-gray-600 dark:text-gray-400">Organisme:</span>
                       </div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">{aid.organization}</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200 text-right break-words">
+                        {aid.organization}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
                       <div className="flex items-center">
                         <Euro className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
                         <span className="text-gray-600 dark:text-gray-400">Montant:</span>
                       </div>
-                      <span className="font-medium text-[#1D40AF] dark:text-blue-300">{aid.amount}</span>
+                      <span className="font-medium text-[#1D40AF] dark:text-blue-300 text-right break-words">
+                        {aid.amount}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
                       <div className="flex items-center">
                         <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
                         <span className="text-gray-600 dark:text-gray-400">Conditions:</span>
                       </div>
-                      <span className="font-medium text-gray-800 dark:text-gray-200">{aid.conditions}</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200 text-right break-words">
+                        {aid.conditions}
+                      </span>
                     </div>
                   </div>
 

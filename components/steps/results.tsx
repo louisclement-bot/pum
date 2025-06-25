@@ -89,6 +89,10 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
             ? "bg-amber-500 dark:bg-amber-600"
             : "bg-red-500 dark:bg-red-600"
 
+  // Determine best text colour for readability based on the bar shade
+  const textColor =
+    coveragePercentage < 50 ? "text-slate-900 dark:text-white" : "text-white"
+
   // Handle share button click
   const handleShare = () => {
     setShowShareOptions(!showShareOptions)
@@ -192,7 +196,7 @@ export default function Results({ data, nextStep, prevStep, goToStep }: ResultsP
             <div className="absolute inset-0 bg-white/20 bg-[length:10px_10px] bg-[0_0] bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] animate-[gradient_1s_linear_infinite]"></div>
           </div>
           <div
-            className={`absolute top-0 h-full flex items-center justify-center px-2 md:px-3 font-bold text-white text-xs md:text-sm print:text-white ${
+            className={`absolute top-0 h-full flex items-center justify-center px-2 md:px-3 font-bold ${textColor} text-xs md:text-sm print:text-white ${
               coveragePercentage < 30 ? "left-0 ml-2" : ""
             }`}
             style={{

@@ -40,7 +40,7 @@ We attacked the problem from **both ends**:
 
 ### 3.1  TabsContent override (`components/ui/tabs.tsx`)
 
-```tsx
+\`\`\`tsx
 <TabsPrimitive.Content
   forceMount   // stops Radix from unmounting
   className={cn(
@@ -52,7 +52,7 @@ We attacked the problem from **both ends**:
 >
   {children}
 </TabsPrimitive.Content>
-```
+\`\`\`
 
 Key points:
 
@@ -69,7 +69,7 @@ Core features:
 
 Usage inside a chart:
 
-```tsx
+\`\`\`tsx
 const { ref: containerRef, isVisible, updateTrigger } = useChartVisibility();
 
 return (
@@ -81,7 +81,7 @@ return (
     )}
   </div>
 );
-```
+\`\`\`
 
 ---
 

@@ -15,7 +15,7 @@ Paths are relative to repository root.
 | Lines (before fix) | **163-180** (bar + inner label) |
 
 ### 1.1 Current code & root cause  
-```tsx
+\`\`\`tsx
 <div className="relative w-full h-5 ...">
   <div className={coverageColor} style={{ width:`${coverageRate}%` }} />
   <div className={`absolute ... ${textColor}`}   // ← white when % ≥50
@@ -23,13 +23,13 @@ Paths are relative to repository root.
     {formatNumber(coverageRate,1)}%
   </div>
 </div>
-```
+\`\`\`
 `textColor` is chosen solely from the **percentage** (`≥50 % → white`). When the bar is short, the label sits on the white track while staying white → no contrast.
 
 ### 1.2 Working solution  
 Render **one** label, keep it *inside* the coloured part and rely on `mix-blend-difference` to auto-invert if it ever drifts outside (supported by all evergreen browsers).
 
-```tsx
+\`\`\`tsx
 /* results.tsx  – replace the whole label block */
 const labelLeft = Math.min(coveragePercentage, 95);   // keep inside parent
 
@@ -46,7 +46,7 @@ const labelLeft = Math.min(coveragePercentage, 95);   // keep inside parent
     {formatNumber(data.coverageRate, 1)}%
   </span>
 </div>
-```
+\`\`\`
 
 ### 1.3 Steps  
 1. Open `components/steps/results.tsx`.  
@@ -68,9 +68,9 @@ The percentage text is always readable (white on colour / inverted on white) wit
 ### 2.1 Current logic  
 * UI calls `getRecommendedTanks(..., 3)` → **3 tanks**  
 * Then calls `getAdditionalRecommendedTanks(... )` which ends with:  
-```ts
+\`\`\`ts
 return additionalTanks.slice(0, 9)   // up to **9** more tanks
-```
+\`\`\`
 Total visible tanks after “Voir plus” = **3+9=12**.
 
 ### 2.2 Root cause  
@@ -78,14 +78,14 @@ Hard-coded `.slice(0, 9)` does not match new requirement (max 6 tanks).
 
 ### 2.3 Working solution  
 
-```diff
+\`\`\`diff
 --- a/lib/productService.ts
 @@
 -    // Limit to 9 tanks maximum
 -    return additionalTanks.slice(0, 9);
 +    // Limit to 3 extra tanks (3 primary + 3 extra = 6 total)
 +    return additionalTanks.slice(0, 3);
-```
+\`\`\`
 
 _No other change is required._  
 The UI automatically receives at most 3 additional tanks; pumps logic (≤2) stays intact.
@@ -105,18 +105,18 @@ The UI automatically receives at most 3 additional tanks; pumps logic (≤2) sta
 | File | `components/steps/recommended-products.tsx` (`ProductCard` inner) |
 
 ### 3.1 Current code & issues  
-```tsx
+\`\`\`tsx
 <div className="aspect-video bg-white relative flex items-center">
   <div className="absolute inset-0 bg-gradient-to-br … z-0" />  // overlays white
   <img className="relative z-10 object-contain" … />
 </div>
 <label className="absolute top-2 left-2 …">…</label>   // no z-index
-```
+\`\`\`
 * The gradient sits **above** the white layer → transparent PNGs show gradient, not white.  
 * Label chips may appear **behind** gradient.
 
 ### 3.2 Working solution  
-```tsx
+\`\`\`tsx
 {/* product image wrapper */}
 <div className="aspect-video relative overflow-hidden">
   {/* solid base colour */}
@@ -136,7 +136,7 @@ The UI automatically receives at most 3 additional tanks; pumps logic (≤2) sta
 {isBestseller && (
   <div className="absolute top-2 right-2 z-20 …">BESTSELLER</div>
 )}
-```
+\`\`\`
 
 ### 3.3 Steps  
 1. In `ProductCard`, adjust wrapper divs as above (white layer first, gradient second).  
@@ -166,16 +166,16 @@ Product pictures sit on solid white; category/bestseller chips are always visibl
 ### 4.3 Working solution  
 
 #### 4.3.1 Use PNG logo
-```ts
+\`\`\`ts
 // delete loadPumLogo() helper entirely
 
 const logoRes = await fetch('/images/pum-logo.png');
 const logoData = await logoRes.arrayBuffer();
 doc.addImage(logoData, 'PNG', 15, 12, 40, 11);
-```
+\`\`\`
 
 #### 4.3.2 Replace project info block with cartridge table
-```ts
+\`\`\`ts
 const infoRows = [
   ['Eau récupérable', `${(data.annualWaterCollectable!/1000).toFixed(0)} m³/an`],
   ['Besoins en eau',   `${(data.annualWaterNeeds!/1000).toFixed(0)} m³/an`],
@@ -189,14 +189,14 @@ autoTable(doc, {
   startY:40,
   headStyles:{ fillColor:[29,64,175] },
 });
-```
+\`\`\`
 Remove the five `doc.text()` calls that previously printed these lines.
 
 #### 4.3.3 Pump table columns
-```ts
+\`\`\`ts
 const pumpColumns = ['Référence', 'Produit'];          // 2 cols
 const pumpRows = recommendedPumps.map(p => [`Réf: ${p.id}`, p.name]);
-```
+\`\`\`
 
 ### 4.4 Steps  
 1. Copy PNG to `public/images/pum-logo.png`.  
@@ -215,19 +215,19 @@ PDF header shows PNG logo; project data in neat two-column table; pump table is 
 | Component | `components/steps/results.tsx` |
 
 ### 5.1 Current layout  
-```html
+\`\`\`html
 <RainfallDetails />
 <ActionButtons />
-```
+\`\`\`
 CTAs follow rainfall card → long scroll on phones.
 
 ### 5.2 Working solution (CSS order)  
-```tsx
+\`\`\`tsx
 <div className={isMobile ? 'flex flex-col-reverse gap-6' : ''}>
   <RainfallDetails data={data} className="mt-6 md:mt-10" />
   <ActionButtons ... />   {/* existing block containing three <Button> components */}
 </div>
-```
+\`\`\`
 No duplication of ActionButtons; on mobile (`max-width:640px`) flex order reverses.
 
 ### 5.3 Steps  

@@ -61,14 +61,14 @@ Volumes uniques triés :
 La V2 introduit un **arrondi unifié « plus proche volume supérieur »** basé sur deux listes
 de capacités _figées_ dans le code :
 
-```ts
+\`\`\`ts
 const AERIAL_CAPS = [400, 700, 1000, 3000, 5000, 10000];
 const BURIED_CAPS = [3000, 5000, 8000, 10000, 20000];
 
 function roundUpToNearestCap(need: number, caps: number[]) {
   return caps.find((c) => c >= need) ?? need; // si > max, on laisse le besoin tel quel
 }
-```
+\`\`\`
 
 | Besoin calculé (L) | Type | Capacité retenue (L) | Règle appliquée |
 |--------------------|------|----------------------|-----------------|
@@ -103,4 +103,4 @@ La nouvelle fonction `roundUpToNearestCap` garantit :
 - Aucune recommandation fantôme.  
 
 Les futures évolutions catalogue se propageront automatiquement via
-`roundUpToNearestCap()` et `getAvailableTankVolumes()`.  
+`roundUpToNearestCap()` et `getAvailableTankVolumes()`.

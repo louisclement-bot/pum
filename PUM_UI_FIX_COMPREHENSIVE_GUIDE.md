@@ -39,7 +39,7 @@ When the address-autocomplete API is unreachable a **red Sonner toast** appears 
 Guard the toast with `process.env.NODE_ENV === "development"`.
 
 ### Code patch – `contexts/AddressSearchContext.tsx`
-```diff
+\`\`\`diff
 -import { toast } from "@/components/ui/sonner"
 +import { toast } from "@/components/ui/sonner"
 
@@ -55,7 +55,7 @@ Guard the toast with `process.env.NODE_ENV === "development"`.
 +  }
    setState((s) => ({ ...s, isSearching: false }))
 }
-```
+\`\`\`
 
 ### QA checklist  
 1. Disable network → search → no red toast in prod build (`NODE_ENV=production`).  
@@ -79,29 +79,29 @@ On iPhone SE viewport the gradient hero band pushes the simulator wizard below t
 Hide desktop header when width ≤ 640 px and make the mobile progress bar sticky to the top.
 
 ### Code patch – `app/layout.tsx`
-```diff
+\`\`\`diff
 -<Header />
 +{/* desktop only */}
 +<div className="hidden sm:block">
 +  <Header />
 +</div>
-```
+\`\`\`
 
 Add helper spacer (prevents jump when switching breakpoints):
-```tsx
+\`\`\`tsx
 function MobileHeaderSpacer() {
   return <div className="sm:hidden h-2" />
 }
-```
+\`\`\`
 Insert `<MobileHeaderSpacer />` just before `{children}`.
 
 ### Code patch – `components/mobile-progress-bar.tsx`
-```diff
+\`\`\`diff
 -<div className={`w-full overflow-x-auto ${className}`}>
 +<div
 +  className={`w-full overflow-x-auto sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur ${className}`}
 +>
-```
+\`\`\`
 
 ### QA checklist  
 1. iPhone SE: first wizard step is fully visible, no header gradient.  
@@ -126,14 +126,14 @@ Text colour hard-coded to `text-white`.
 Switch text colour to dark when bar colour is light.
 
 ### Code patch – `components/steps/results.tsx`
-```diff
+\`\`\`diff
 -<div className={`absolute top-0 h-full flex items-center ... font-bold text-white text-xs md:text-sm ...`}
 +const textColor =
 +  coveragePercentage < 50 ? "text-slate-900 dark:text-white" : "text-white"
 +
 +<div
 +  className={`absolute top-0 h-full flex items-center ... font-bold ${textColor} text-xs md:text-sm ...`}
-```
+\`\`\`
 
 ### QA checklist  
 • Test with 25 %, 55 %, 90 % values in both themes → text readable.  
@@ -156,7 +156,7 @@ Each row is built with `flex justify-between` → fixed gap; long left text over
 Replace row with CSS grid (two columns) so text wraps naturally.
 
 ### Code patch – `components/steps/financial-aid.tsx`
-```diff
+\`\`\`diff
 -<div className="flex justify-between items-center">
 +<div className="grid grid-cols-[auto_1fr] gap-2 items-start">
 ...
@@ -164,7 +164,7 @@ Replace row with CSS grid (two columns) so text wraps naturally.
 +<span className="font-medium text-gray-800 ... text-right break-words">
 +  {aid.organization}
 +</span>
-```
+\`\`\`
 Apply same pattern to **Montant** & **Conditions** rows.
 
 ### QA checklist  
@@ -188,7 +188,7 @@ Design decision: monthly/cumulative charts no longer required; only high-level s
 Strip toggle button, `isExpanded` state, and the entire charts container. Component ends after the three `StatCard` blocks.
 
 ### Code patch – `components/rainfall-details.tsx` (excerpt)
-```diff
+\`\`\`diff
 -// 🔥  delete Button & Chevron imports
 -import { Button } from "@/components/ui/button"
 -import { ChevronDown, ChevronUp } from "lucide-react"
@@ -203,7 +203,7 @@ Strip toggle button, `isExpanded` state, and the entire charts container. Compon
 -// 🔥  delete <motion.div> ...charts...
 -// The file now terminates right here.
 +</div> {/* end of CardContent */}
-```
+\`\`\`
 
 ### QA checklist  
 1. Rainfall card shows only total / wettest / driest blocks.  
@@ -229,11 +229,11 @@ Add solid white layer underneath gradient.
 ### Code patch – `components/steps/recommended-products.tsx`  
 Inside **`ProductCard`** (≈ line 180):
 
-```diff
+\`\`\`diff
 -<div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center overflow-hidden">
 +<div className="aspect-video bg-white relative flex items-center justify-center overflow-hidden">
 +  <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700"></div>
-```
+\`\`\`
 
 No other changes required.
 

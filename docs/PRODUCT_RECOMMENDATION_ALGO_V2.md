@@ -57,10 +57,10 @@ This document analyses the **existing** product-recommendation flow (tanks & pum
 
 ### 3.2 Capacity rounding
 
-```ts
+\`\`\`ts
 const AERIAL_CAPS = [400, 700, 1000, 3000, 5000, 10000];
 const BURIED_CAPS = [3000, 5000, 8000, 10000, 20000];
-```
+\`\`\`
 
 `roundUpToNearestCap(need, typeList)` returns the **smallest capacity ≥ need** from the list; if none exists (need > largest), keep `need` (existing fallback).
 
@@ -84,9 +84,9 @@ const BURIED_CAPS = [3000, 5000, 8000, 10000, 20000];
 
 ### 4.1 Branch
 
-```bash
+\`\`\`bash
 git checkout -b droid/product-reco-refactor
-```
+\`\`\`
 
 ### 4.2 Code changes
 

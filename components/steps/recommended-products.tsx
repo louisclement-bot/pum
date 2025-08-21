@@ -26,6 +26,29 @@ import {
 } from "@/lib/productService"
 import { downloadSimulationPDF } from "@/lib/pdfGenerator"
 
+// Helper: safely encode external image URLs without double-encoding
+function normalizeUrl(url: string): string {
+  if (!url || typeof url !== "string") return "/placeholder.svg"
+  // keep data URLs or root-relative paths untouched
+  if (url.startsWith("data:") || url.startsWith("/")) return url
+  try {
+    const u = new URL(url)
+    const segments = u.pathname.split("/").map((seg) => {
+      if (!seg) return seg
+      try {
+        return encodeURIComponent(decodeURIComponent(seg))
+      } catch {
+        return encodeURIComponent(seg)
+      }
+    })
+    u.pathname = segments.join("/")
+    return u.toString()
+  } catch {
+    // Fallback: best-effort encode whole URI and apostrophes
+    return encodeURI(url).replace(/'/g, "%27")
+  }
+}
+
 type RecommendedProductsProps = {
   data: SimulatorData
   prevStep: () => void
@@ -263,7 +286,7 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
           {/* 1️⃣ Solid white layer */}
           <div className="absolute inset-0 bg-white z-0" />
           <img
-            src={product.imageUrl || "/placeholder.svg"}
+            src={normalizeUrl(product.imageUrl || "/placeholder.svg")}
             alt={product.name}
             className="relative z-10 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
           />

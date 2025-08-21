@@ -1,5 +1,4 @@
 import Image from "next/image"
-
 type PumLogoProps = {
   className?: string
   width?: number

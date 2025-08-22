@@ -28,6 +28,7 @@ import { downloadSimulationPDF } from "@/lib/pdfGenerator"
 
 // Helper: safely encode external image URLs without double-encoding
 function normalizeUrl(url: string): string {
+
   /**
    * NOTE: All `imageUrl` values inside `products.json` have been cleaned and
    * properly encoded by `scripts/fix-image-urls.js`.
@@ -79,6 +80,7 @@ function normalizeUrl(url: string): string {
     // Last-chance fallback: light encode + apostrophe replacement
     const safe = encodeURI(url).replace(/'/g, "%27").replace(/ /g, "%20")
     return isValid(safe) ? safe : "/placeholder.svg"
+
   }
 }
 

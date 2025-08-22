@@ -4,6 +4,41 @@ import type { SimulatorData } from "@/components/rainwater-simulator"
 import type { Product } from "@/lib/productService"
 
 /**
+ * Loads an SVG from the given URL, draws it onto an off-screen canvas and
+ * returns a PNG data-URL that can be consumed by jsPDF.addImage.
+ * Keeps everything same-origin to avoid CORS / tainted canvas issues.
+ */
+async function svgUrlToPngDataUrl(
+  svgUrl: string,
+  width = 400,
+  height = 110,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      const img = new Image()
+      img.crossOrigin = "anonymous"
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        if (!ctx) {
+          reject(new Error("Canvas 2D context unavailable"))
+          return
+        }
+        ctx.clearRect(0, 0, width, height)
+        ctx.drawImage(img, 0, 0, width, height)
+        resolve(canvas.toDataURL("image/png"))
+      }
+      img.onerror = (e) => reject(e)
+      img.src = svgUrl
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+/**
  * Generates a PDF document with simulation results and product recommendations
  * 
  * @param data Simulation data with user inputs and calculated results
@@ -23,17 +58,11 @@ export async function generateSimulationPDF(
    * 1️⃣  HEADER : PUM logo and title
    * --------------------------------------------------------- */
   try {
-    // Load PNG logo
-    const res = await fetch("/images/pum-logo.png")
-    if (res.ok) {
-      const buffer = await res.arrayBuffer()
-      // Draw logo (≈40 × 11 mm) on the left side of the header
-      doc.addImage(buffer, "PNG", 15, 12, 40, 11)
-    } else {
-      console.warn("Unable to fetch PUM PNG logo, status:", res.status)
-    }
+    const pngDataUrl = await svgUrlToPngDataUrl("/images/pum-logo.svg", 400, 110)
+    // Draw logo (≈40 × 11 mm) on the left side of the header
+    doc.addImage(pngDataUrl, "PNG", 15, 12, 40, 11)
   } catch (e) {
-    console.warn("Unable to embed PUM PNG logo in PDF:", e)
+    console.warn("Unable to embed PUM SVG logo in PDF:", e)
   }
   
   // Add title

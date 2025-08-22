@@ -26,6 +26,62 @@ import {
 } from "@/lib/productService"
 import { downloadSimulationPDF } from "@/lib/pdfGenerator"
 
+// Helper: safely encode external image URLs without double-encoding
+function normalizeUrl(url: string): string {
+  /**
+   * NOTE: All `imageUrl` values inside `products.json` have been cleaned and
+   * properly encoded by `scripts/fix-image-urls.js`.
+   * This helper now acts mostly as a *safety-net* in case new raw URLs slip in.
+   *
+   * Rules:
+   * 1.  Keep data-URIs and root-relative paths untouched
+   * 2.  Validate external URLs – if they are already valid, return as-is
+   * 3.  If parsing fails, apply a light encodeURI + apostrophe fix
+   * 4.  Always fall back to `/placeholder.svg` on failure
+   */
+
+  if (!url || typeof url !== "string") return "/placeholder.svg"
+
+  // data URIs & site-local assets
+  if (url.startsWith("data:") || url.startsWith("/")) return url
+
+  // quick validation helper
+  const isValid = (str: string) => {
+    try {
+      // URL ctor throws on invalid URL
+      // eslint-disable-next-line no-new
+      new URL(str)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  // Already valid → return early
+  if (isValid(url)) return url
+
+  // Attempt to re-encode each path segment once (prevents double encoding)
+  try {
+    const parsed = new URL(encodeURI(url))
+    parsed.pathname = parsed.pathname
+      .split("/")
+      .map((segment) => {
+        if (!segment) return segment
+        try {
+          return encodeURIComponent(decodeURIComponent(segment))
+        } catch {
+          return encodeURIComponent(segment)
+        }
+      })
+      .join("/")
+    return parsed.toString()
+  } catch {
+    // Last-chance fallback: light encode + apostrophe replacement
+    const safe = encodeURI(url).replace(/'/g, "%27").replace(/ /g, "%20")
+    return isValid(safe) ? safe : "/placeholder.svg"
+  }
+}
+
 type RecommendedProductsProps = {
   data: SimulatorData
   prevStep: () => void
@@ -263,7 +319,7 @@ function ProductCard({ product, isBestseller = false }: ProductCardProps) {
           {/* 1️⃣ Solid white layer */}
           <div className="absolute inset-0 bg-white z-0" />
           <img
-            src={product.imageUrl || "/placeholder.svg"}
+            src={normalizeUrl(product.imageUrl || "/placeholder.svg")}
             alt={product.name}
             className="relative z-10 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
           />
